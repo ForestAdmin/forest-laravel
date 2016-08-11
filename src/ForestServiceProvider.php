@@ -1,5 +1,6 @@
 <?php namespace ForestAdmin\ForestLaravel;
 
+use ForestAdmin\ForestLaravel\Http\Console\Commands\PostMapCommand;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +21,12 @@ class ForestServiceProvider extends ServiceProvider
         $this->app->router->group(['namespace' => $namespace . 'Http\Controllers'], function() {
             require __DIR__. '/Http/routes.php';
         });
+
+        // Publish a config file
+        $this->publishes([
+
+            __DIR__.'/../config/forest.php' => config_path('forest.php'),
+        ]);
     }
 
     /**
@@ -27,8 +34,10 @@ class ForestServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
-        //
+    public function register() {
+        $this->commands('command.forest.postmap');
+        $this->app->singleton('command.forest.postmap', function($app) {
+            return new PostMapCommand();
+        });
     }
 }
