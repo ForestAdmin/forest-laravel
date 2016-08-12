@@ -28,27 +28,43 @@ class PostMapCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
-    /**
-     * @var FileSystem
-     */
-    protected $files;
+    protected $description = 'Extract the structure of the database from the models';
 
+    /**
+     * Array containing the properties of a models
+     *
+     * @var array
+     */
     protected $properties = array();
+
+    /**
+     * Array containing the methods of a models
+     *
+     * @var array
+     */
     protected $methods = array();
-    protected $write = false;
+
+    /**
+     * Array containing the directories where to search for models
+     *
+     * @var array
+     */
     protected $dirs = array();
+
+    /**
+     * Array containing the collections of models that make the structure of the database
+     *
+     * @var array
+     */
     protected $collections = array();
 
     /**
      * Create a new command instance.
      *
-     * @param Filesystem $files
      */
     public function __construct()
     {
         parent::__construct();
-//        $this->files = $files;
     }
 
     /**
@@ -58,83 +74,103 @@ class PostMapCommand extends Command
      */
     public function handle()
     {
+        // TODO: Include the options and argument so the command is more flexible
         $this->dirs = array_merge(
             Config::get('forest.ModelLocations')
 //            $this->option('dir')
         );
 
-        $this->info('It works');
-        $this->generateApiMap();
-        $this->info('It ends');
+        $this->retrieveCollections();
     }
 
 
     /**
      * Retrieve collections from the models
      */
-    protected function generateApiMap()
+    protected function retrieveCollections()
     {
+        // check if the DBAL driver instance exist
         $hasDoctrine = interface_exists('Doctrine\DBAL\Driver');
 
         $models = $this->loadModels();
 
+        // for each model
         foreach ($models as $name) {
+            // rest of the two arrays that would contain data from the last model
             $this->properties = array();
             $this->methods = array();
 
             if (class_exists($name)) {
                 try {
+                    // Instanciate reflection on the model
                     $reflectionClass = new \ReflectionClass($name);
 
+                    // If not an extension of the class model
                     if (!$reflectionClass->isSubclassOf('Illuminate\Database\Eloquent\Model')) {
                         continue;
                     } else {
                         $this->info('Model : '.$name);
                     }
 
+                    // If not an abstract class
                     if (!$reflectionClass->IsInstantiable()) {
                         continue;
                     }
 
+                    // Instantiate the model
                     $model = $this->laravel->make($name);
 
+                    // If we have the doctrine driver we can retrieve properties dat
                     if ($hasDoctrine) {
                         $this->getPropertiesFromTable($model);
                     }
 
+                    // We retreive the methos to find the relations, foreign key
                     $this->getPropertiesFromMethods($model);
 
+                    // Generate the collection for this model
                     $this->collections[] = $this->generateCollection(
                         $name,
-                        $reflectionClass->getName()
+                        $reflectionClass->getName(),
+                        $model
                     );
 
-                    $this->info('test');
-
                 } catch (\Exception $e) {
-                    dd('I caught '.$e->getMessage());
+                    var_dump($e->getMessage());
                 }
             }
 
         }
-
-        dd($this->collections);
-
     }
 
-    protected function generateCollection($name, $entityClassName) {
+    /**
+     * Generate a collection from an eloquent model
+     *
+     * @param $name
+     * @param $entityClassName
+     * @param $model
+     * @return ForestCollection
+     */
+    protected function generateCollection($name, $entityClassName, $model) {
 
         $properties = [];
+
+        // For each properties
         foreach($this->properties as $fieldName => $property) {
+            // Check if it's really a property
             if ($property['comment'] == "") {
-                // TODO: create object pivot with constructor only with Foreign key id (library_id)
-                // TODO: create references with the references to where the foreign key point (book.id)
+                // Instantiation of a field for the property
                 $properties[] = new ForestField($fieldName, $property['type']);
+            // Else it's a relation, foreign key
             } else {
+                // Go through the existing properties
+                // (since the properties are first in the array and relation after)
                 foreach ($properties as $field) {
                     $foreign = explode('>', $property['comment']);
+                    // retrieve the foreign_key name and where it points to
                     list($currentProperty, $reference) = $foreign;
 
+                    // If this field is the foreign key
                     if ($field->getField() == $currentProperty) {
                         $pivot = new ForestPivot($currentProperty);
                         $field->setPivot($pivot);
@@ -144,12 +180,15 @@ class PostMapCommand extends Command
             }
         }
 
-        $collection = new ForestCollection($name, $entityClassName, '', $properties);
+        // Instatiation of a Collection for the model
+        $collection = new ForestCollection($name, $entityClassName, $model->getKeyName(), $properties);
 
         return $collection;
     }
 
     /**
+     * Load an array of the models from the directories
+     *
      * @return array
      */
     public function loadModels() {
@@ -167,18 +206,16 @@ class PostMapCommand extends Command
         return $models;
     }
 
+    /**
+     * Extract the properties from a model
+     *
+     * @param $model
+     */
     public function getPropertiesFromTable($model) {
         $table = $model->getConnection()->getTablePrefix() . $model->getTable();
         $schema = $model->getConnection()->getDoctrineSchemaManager($table);
         $databasePlatform = $schema->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
-
-        $platformName = $databasePlatform->getName();
-        $customTypes = $this->laravel['config']->get("ide-helper.custom_db_types.{$platformName}", array());
-
-        foreach ($customTypes as $yourTypeName => $doctrineTypeName) {
-            $databasePlatform->registerDoctrineTypeMapping($yourTypeName, $doctrineTypeName);
-        }
 
         $database = null;
 
@@ -235,6 +272,8 @@ class PostMapCommand extends Command
     }
 
     /**
+     * Retrieve the methods from a model
+     *
      * @param \Illuminate\Database\Eloquent\Model $model
      */
     protected function getPropertiesFromMethods($model) {
@@ -315,7 +354,7 @@ class PostMapCommand extends Command
 //                                        $method,
 //                                        $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
 //                                        true,
-//                                        null,
+//                                   -     null,
 //                                        $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
 //                                    );
                                 } elseif ($relation === "morphTo") {
@@ -348,31 +387,30 @@ class PostMapCommand extends Command
     }
 
     /**
+     * Add a property extracted form the model to the properties array
+     *
      * @param string $name
      * @param string|null $type
-     * @param bool|null $read
-     * @param bool|null $write
      * @param string|null $comment
      */
-    protected function setProperty($name, $type = null, $read = null, $write = null, $comment = '') {
+    protected function setProperty($name, $type = null, $comment = '') {
         if (!isset($this->properties[$name])) {
             $this->properties[$name] = array();
             $this->properties[$name]['type'] = 'mixed';
-            $this->properties[$name]['read'] = false;
-            $this->properties[$name]['write'] = false;
             $this->properties[$name]['comment'] = (string) $comment;
         }
         if ($type !== null) {
             $this->properties[$name]['type'] = $type;
         }
-        if ($read !== null) {
-            $this->properties[$name]['read'] = $read;
-        }
-        if ($write !== null) {
-            $this->properties[$name]['write'] = $write;
-        }
     }
 
+    /**
+     * Add a method extracted from the model to the methods array
+     *
+     * @param $name
+     * @param string $type
+     * @param array $arguments
+     */
     protected function setMethod($name, $type = '', $arguments = array()) {
         $methods = array_change_key_case($this->methods, CASE_LOWER);
         if (!isset($methods[strtolower($name)])) {
