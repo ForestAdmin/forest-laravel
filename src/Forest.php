@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: dib258
- * Date: 09/08/16
- * Time: 15:02
- */
 
 namespace ForestAdmin\ForestLaravel;
 
