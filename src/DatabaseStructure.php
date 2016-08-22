@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\ForestLaravel;
 
+use ForestAdmin\Liana\Api\Map;
+use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -11,6 +13,7 @@ use Symfony\Component\ClassLoader\ClassMapGenerator;
 use ForestAdmin\Liana\Model\Collection as ForestCollection;
 use ForestAdmin\Liana\Model\Field as ForestField;
 use ForestAdmin\Liana\Model\Pivot as ForestPivot;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class DatabaseStructure {
     /**
@@ -73,8 +76,16 @@ class DatabaseStructure {
             $collections = $object->generateCollections();
             $serialized = serialize($collections);
 
+            self::postApimap();
+
             return $serialized;
         }));
+    }
+
+    public function setCollections($collections)
+    {
+        Cache::forever('forestCollections', serialize($collections));
+        DatabaseStructure::postApimap();
     }
 
     /**
@@ -121,9 +132,12 @@ class DatabaseStructure {
                     // We retreive the methos to find the relations, foreign key
                     $this->getPropertiesFromMethods($model);
 
+
+                    $className = explode('\\', $name);
+
                     // Generate the collection for this model
                     $collection = $this->generateCollection(
-                        $name,
+                        strtolower(end($className)),
                         $reflectionClass->getName(),
                         $model
                     );
@@ -177,7 +191,8 @@ class DatabaseStructure {
         }
 
         // Instatiation of a Collection for the model
-        $collection = new ForestCollection($name, $entityClassName, $model->getKeyName(), $properties);
+        $primaryKey = [$model->getKeyName()];
+        $collection = new ForestCollection($name, $entityClassName, $primaryKey, $properties);
 
         return $collection;
     }
@@ -427,5 +442,44 @@ class DatabaseStructure {
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = new $className;
         return '\\' . get_class($model->newCollection());
+    }
+
+    public static function postApimap()
+    {
+        $map = self::getApimap();
+
+//        dd(substr($map, 0, -2));
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'forest-secret-key' => '4d737c706cbd622b45820ecfe6669cab36e26ea600df8e35a69b91502cb9749f'
+            ],
+            'body' => $map
+        ];
+
+        $client = new Client();
+
+        $response = $client->request('POST', Config::get('forest.ApiMap'), $options);
+
+        if ($response->getStatusCode() != 204) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function getApimap()
+    {
+        $map = new Map(DatabaseStructure::getCollections(), self::getApimapMeta());
+        return $map->getApimap();
+    }
+
+    protected static function getApimapMeta()
+    {
+        return [
+            'liana' => Config::get('forest.Liana'),
+            'liana_version' => Config::get('forest.LianaVersion')
+        ];
     }
 }
