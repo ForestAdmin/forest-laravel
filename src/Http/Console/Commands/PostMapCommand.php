@@ -80,6 +80,10 @@ class PostMapCommand extends Command
 //            $this->option('dir')
         );
 
-        return ((new DatabaseStructure($this->dirs, $this))->retrieveCollections());
+        $dbstruct = new DatabaseStructure($this->dirs, $this);
+
+        $dbstruct->setCollections($dbstruct->generateCollections());
+
+        return true;
     }
 }
