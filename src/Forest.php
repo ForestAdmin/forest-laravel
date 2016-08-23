@@ -6,12 +6,12 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
 use Psecio\Jwt\Header as JwtHeader;
 use Psecio\Jwt\Jwt;
-use ForestAdmin\ForestPhp\Liana\Api\Map;
+use ForestAdmin\Liana\Api\Map;
 
 class Forest {
 
     public function getAllowedUsers($data) {
-        $renderingId = $data->renderingID;
+        $renderingId = $data->renderingId;
 
         $uri = Config::get('forest.URI').'/forest/renderings/'.$renderingId.'/allowed-users';
 
@@ -28,10 +28,14 @@ class Forest {
 
         $allowedUsers = [];
 
-        foreach($response->data as $res) {
-            $user = $res->atributes;
-            $user->id = $res->id;
-            $allowedUsers[] = $user;
+        if ($response) {
+            foreach($response->data as $res) {
+                $user = $res->attributes;
+                $user->id = $res->id;
+                $allowedUsers[] = $user;
+            }
+        } else {
+            return \Response::make('Cannot retrieve data from Forest Admin', 505);
         }
 
         return $allowedUsers;
@@ -48,9 +52,9 @@ class Forest {
         ));
 
         $jwt->issuer(Config::get('forest.URI'))
-            ->isuedAt(time())
+            ->issuedAt(time())
             ->notBefore(time()+60)
-            ->expiredTime(time()+3600)
+            ->expireTime(time()+3600)
             ->jwtId($user->id);
 
         return $jwt->encode();
