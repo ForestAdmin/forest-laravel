@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\ForestLaravel\Http\Controllers;
 
+use ForestAdmin\ForestLaravel\DatabaseStructure;
 use ForestAdmin\ForestLaravel\Forest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,6 +16,8 @@ class ForestController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index() {
+        DatabaseStructure::getCollections();
+        
         return \Response::make('Package installed correctly', 204);
     }
 
@@ -41,9 +44,10 @@ class ForestController extends Controller
 
         if ($currentUser) {
             $token = $forest->generateAuthToken($currentUser);
-            return Responce::json(['token' => $token]);
+            return response()->json(['token' => $token]);
         }
 
-        return Response::make('Unauthorized', 401);
+        return response()->make('Unauthorized', 401);
     }
 }
+
