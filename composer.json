@@ -1,0 +1,36 @@
+{
+  "name": "forestadmin/forest-laravel",
+  "description": "Liana is part of the ForestAdmin project. This library analyzes the database structure of an application and restitutes a map of it.",
+  "type": "library",
+  "require": {
+    "psecio/jwt": "^1.7",
+    "symfony/class-loader": "^3.1",
+    "doctrine/dbal": "^2.5",
+    "alsvanzelf/jsonapi": "^1.3",
+    "guzzlehttp/guzzle": "^6.2",
+    "neomerx/json-api": "^0.8.8"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.3"
+  },
+  "license": "GNU GPLv3",
+  "authors": [
+    {
+      "name": "Sandro Munda",
+      "email": "sandro@munda.me"
+    },
+    {
+      "name": "Ludovic Esmanne",
+      "email": "lesmanne@gmail.com"
+    },
+    {
+      "name": "Jean-Marc Leroy",
+      "email": "jean-marc@lg21.be"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ForestAdmin\\ForestLaravel\\" : "src"
+    }
+  }
+}
