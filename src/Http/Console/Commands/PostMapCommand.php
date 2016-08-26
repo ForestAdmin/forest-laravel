@@ -31,32 +31,11 @@ class PostMapCommand extends Command
     protected $description = 'Extract the structure of the database from the models';
 
     /**
-     * Array containing the properties of a models
-     *
-     * @var array
-     */
-    protected $properties = array();
-
-    /**
-     * Array containing the methods of a models
-     *
-     * @var array
-     */
-    protected $methods = array();
-
-    /**
      * Array containing the directories where to search for models
      *
      * @var array
      */
     protected $dirs = array();
-
-    /**
-     * Array containing the collections of models that make the structure of the database
-     *
-     * @var array
-     */
-    protected $collections = array();
 
     /**
      * Create a new command instance.
