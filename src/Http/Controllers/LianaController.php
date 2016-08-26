@@ -62,7 +62,16 @@ class LianaController extends Controller
      */
     public function getHasMany($modelName, $recordId, $associationName, Request $request)
     {
+        try {
+            $collections = DatabaseStructure::getCollections();
+            $liana = (new Liana)->setCollections($collections);
+            $filter = new ResourceFilter($request->all());
+            $resource = $liana->getHasMany($modelName, $recordId, $associationName, $filter);
+        } catch(\Excepiton $exc) {
+            return new Response($exc->getMessage(), 404);
+        }
 
+        return $this->returnJson($resource);
     }
 
     public function createResource(Request $request, $modelName)
