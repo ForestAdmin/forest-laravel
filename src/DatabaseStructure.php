@@ -21,34 +21,38 @@ class DatabaseStructure {
      *
      * @var array
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * Array containing the methods of a models
      *
      * @var array
      */
-    protected $methods = array();
+    protected $methods = [];
 
     /**
      * Array containing the directories where to search for models
      *
      * @var array
      */
-    protected $dirs = array();
+    protected $dirs = [];
 
     /**
      * Array containing the collections of models that make the structure of the database
      *
      * @var array
      */
-    protected $collections = array();
+    protected $collections = [];
 
     /**
      * @var null
      */
     private $commandPointer = null;
 
+    /**
+     * Send info message either it's called from the console or an instance in the website
+     * @param $message
+     */
     protected function sendInfo($message) {
         if ($this->commandPointer && method_exists($this->commandPointer, 'info')) {
             $this->commandPointer->info($message);
@@ -70,26 +74,45 @@ class DatabaseStructure {
         $this->commandPointer = $commandPointer;
     }
 
+    /**
+     * Static method to retrieve an array of ForestCollections
+     * if the collection has already been cached we return it, otherwise we instanciate this object to create new version
+     * @return mixed
+     */
     public static function getCollections() {
         return unserialize(Cache::rememberForever('forestCollections', function() {
             $object = new DatabaseStructure(Config::get('forest.ModelLocations'), null);
             $collections = $object->generateCollections();
             $serialized = serialize($collections);
 
-            self::postApimap();
+            if (!self::postApimap()) {
+                throw Exception('Apimap was not send correctly to the ForestAdmin server');
+            }
 
             return $serialized;
         }));
     }
 
+
+    /**
+     * Method to set the array of ForestCollection to the cache
+     * After the new map of the database is made we generate the apimap and post it to ForestAdmin's server
+     * @param $collections
+     * @throws Exception
+     */
     public function setCollections($collections)
     {
+        // Cache array of ForestCollection
         Cache::forever('forestCollections', serialize($collections));
-        DatabaseStructure::postApimap();
+        // Generate and send the apimap
+        if (!DatabaseStructure::postApimap()) {
+            throw Exception('Apimap was not send correctly to the ForestAdmin server');
+        }
     }
 
     /**
-     * Retrieve collections from the models
+     * Generate collections from the models
+     * @return array
      */
     public function generateCollections()
     {
@@ -101,8 +124,8 @@ class DatabaseStructure {
         // for each model
         foreach ($models as $name) {
             // rest of the two arrays that would contain data from the last model
-            $this->properties = array();
-            $this->methods = array();
+            $this->properties = [];
+            $this->methods = [];
 
             if (class_exists($name)) {
                 try {
@@ -131,8 +154,7 @@ class DatabaseStructure {
 
                     // We retreive the methos to find the relations, foreign key
                     $this->getPropertiesFromMethods($model);
-
-
+                    
                     $className = explode('\\', $name);
 
                     // Generate the collection for this model
@@ -149,13 +171,12 @@ class DatabaseStructure {
             }
         }
 
-//        dd($this->collections);
         return $this->collections;
     }
 
+
     /**
      * Generate a collection from an eloquent model
-     *
      * @param $name
      * @param $entityClassName
      * @param $model
@@ -178,11 +199,11 @@ class DatabaseStructure {
                 foreach ($properties as $field) {
                     $foreign = explode('>', $property['comment']);
                     // retrieve the foreign_key name and where it points to
-                    list($currentProperty, $reference) = $foreign;
+                    list($currentProperty, $table, $reference) = $foreign;
 
                     // If this field is the foreign key
                     if ($field->getField() == $currentProperty) {
-                        $pivot = new ForestPivot($currentProperty);
+                        $pivot = new ForestPivot($currentProperty, $table);
                         $field->setPivot($pivot);
                         $field->setReference($reference);
                     }
@@ -203,7 +224,7 @@ class DatabaseStructure {
      * @return array
      */
     public function loadModels() {
-        $models = array();
+        $models = [];
 
         foreach($this->dirs as $dir) {
             $dir = base_path(). '/' . $dir;
@@ -289,7 +310,9 @@ class DatabaseStructure {
      */
     protected function getPropertiesFromMethods($model) {
         $methods = get_class_methods($model);
+
         if ($methods) {
+
             foreach ($methods as $method) {
 
                 if (Str::startsWith($method, 'get') && Str::endsWith(
@@ -353,34 +376,32 @@ class DatabaseStructure {
                             $this->sendInfo('This is '.$relation);
                             //Resolve the relation's model to a Relation object.
                             $relationObj = $model->$method();
+
                             if ($relationObj instanceof Relation) {
                                 $this->sendInfo('It is an instance of Relation');
                                 $relatedModel = '\\' . get_class($relationObj->getRelated());
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
-                                    $this->sendInfo('-------------> First relation');
                                     //Collection or array of models (because Collection is Arrayable)
-                                    // TODO : in the case of a hasMany there's no foreign key
-//                                    $this->setProperty(
-//                                        $method,
-//                                        $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
-//                                        $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
-//                                    );
+                                    // in the case of a hasMany there's no foreign key
+                                    // $this->setProperty(
+                                    //     $method,
+                                    //     $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
+                                    //     $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+                                    // );
                                 } elseif ($relation === "morphTo") {
-                                    $this->sendInfo('-------------> second relation');
                                     // Model isn't specified because relation is polymorphic
                                     $this->setProperty(
                                         $method,
                                         '\Illuminate\Database\Eloquent\Model|\Eloquent',
-                                        $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey()
                                     );
                                 } else {
-                                    $this->sendInfo('-------------> Third relation');
                                     //Single model is returned
                                     $this->setProperty(
                                         $method,
                                         $relatedModel,
-                                        $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey()
                                     );
                                 }
                             }
@@ -400,7 +421,7 @@ class DatabaseStructure {
      */
     protected function setProperty($name, $type = null, $comment = '') {
         if (!isset($this->properties[$name])) {
-            $this->properties[$name] = array();
+            $this->properties[$name] = [];
             $this->properties[$name]['type'] = 'mixed';
             $this->properties[$name]['comment'] = (string) $comment;
         }
@@ -416,10 +437,10 @@ class DatabaseStructure {
      * @param string $type
      * @param array $arguments
      */
-    protected function setMethod($name, $type = '', $arguments = array()) {
+    protected function setMethod($name, $type = '', $arguments = []) {
         $methods = array_change_key_case($this->methods, CASE_LOWER);
         if (!isset($methods[strtolower($name)])) {
-            $this->methods[$name] = array();
+            $this->methods[$name] = [];
             $this->methods[$name]['type'] = $type;
             $this->methods[$name]['arguments'] = $arguments;
         }
@@ -444,11 +465,16 @@ class DatabaseStructure {
         return '\\' . get_class($model->newCollection());
     }
 
+    /**
+     * Send the Apimap to the ForestAdmin's server
+     * @return bool
+     */
     public static function postApimap()
     {
         $map = self::getApimap();
-
-//        dd(substr($map, 0, -2));
+        // Removed PHP_EOL at the end of the files because it make some bug
+        // didn't correct it in forest-php package because maybe it's needed there
+        $map = str_replace(PHP_EOL, '', $map);
 
         $options = [
             'headers' => [
@@ -460,7 +486,9 @@ class DatabaseStructure {
 
         $client = new Client();
 
+        // Send the Apimap
         $response = $client->request('POST', Config::get('forest.ApiMap'), $options);
+
 
         if ($response->getStatusCode() != 204) {
             return false;
@@ -469,12 +497,20 @@ class DatabaseStructure {
         return true;
     }
 
+    /**
+     * Generate and retrieve Apimap
+     * @return string
+     */
     public static function getApimap()
     {
         $map = new Map(DatabaseStructure::getCollections(), self::getApimapMeta());
         return $map->getApimap();
     }
 
+    /**
+     * Retrieve Apimap metas
+     * @return array
+     */
     protected static function getApimapMeta()
     {
         return [
