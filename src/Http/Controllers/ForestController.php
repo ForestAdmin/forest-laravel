@@ -30,21 +30,22 @@ class ForestController extends Controller
      */
     public function sessions(Request $request, Forest $forest) {
         $data = json_decode($request->getContent());
-//        $forest = new Forest();
 
-        $allowedUsers = $forest->getAllowedUsers($data);
+        if ($data) {
+            $allowedUsers = $forest->getAllowedUsers($data);
 
-        $currentUser = null;
-        foreach($allowedUsers as $user) {
-            if ($user->email == $data->email && password_verify($data->password, $user->password)) {
-                $currentUser = $user;
-                break;
+            $currentUser = null;
+            foreach($allowedUsers as $user) {
+                if ($user->email == $data->email && password_verify($data->password, $user->password)) {
+                    $currentUser = $user;
+                    break;
+                }
             }
-        }
 
-        if ($currentUser) {
-            $token = $forest->generateAuthToken($currentUser);
-            return response()->json(['token' => $token]);
+            if ($currentUser) {
+                $token = $forest->generateAuthToken($currentUser);
+                return response()->json(['token' => $token]);
+            }
         }
 
         return response()->make('Unauthorized', 401);

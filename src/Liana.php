@@ -3,6 +3,7 @@
 namespace ForestAdmin\ForestLaravel;
 
 use ForestAdmin\Liana\Adapter\EloquentAdapter;
+use ForestAdmin\Liana\Exception\CollectionNotFoundException;
 
 class Liana
 {
