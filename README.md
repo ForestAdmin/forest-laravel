@@ -11,9 +11,10 @@ Step 1: Install the Package
 ---------------------------
 
 Open a command console, enter your project directory and execute the
-following command to download the latest stable version of this package:
+following commands to download the latest stable version of this package:
 
 ```bash
+$ composer require forestadmin/forest-php dev-master
 $ composer require forestadmin/forest-symfony
 ```
 
@@ -99,6 +100,6 @@ To do so, you just have to run the following command
  ```
 
 This command should be run each time that you make modification in your database's structure. (Not when a new data is inserted)
-Mainly, whenever you run a `php artisan migrate` you should run after that the command above.
+Mainly, whenever you run a `php artisan migrate` you should run the command above after.
 
 Right now, I didn't found a way to automate this process. If you have an idea, contact me ;)
