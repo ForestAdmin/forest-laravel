@@ -16,8 +16,6 @@ class ForestController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        DatabaseStructure::getCollections();
-        
         return \Response::make('Package installed correctly', 204);
     }
 
