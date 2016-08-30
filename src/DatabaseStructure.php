@@ -166,7 +166,7 @@ class DatabaseStructure {
                     $this->collections[] = $collection;
 
                 } catch (\Exception $e) {
-                    var_dump($e->getMessage());
+                    var_dump($e->getFile().$e->getLine().': '.$e->getMessage());
                 }
             }
         }
@@ -196,18 +196,32 @@ class DatabaseStructure {
             } else {
                 // Go through the existing properties
                 // (since the properties are first in the array and relation after)
-                foreach ($properties as $field) {
-                    $foreign = explode('>', $property['comment']);
-                    // retrieve the foreign_key name and where it points to
-                    list($currentProperty, $table, $reference) = $foreign;
+                var_dump($fieldName.' : '.$property['type']);
+                $foreign = explode('>', $property['comment']);
+                // retrieve the foreign_key name and where it points to
+                list($currentProperty, $table, $reference, $relation) = $foreign;
 
-                    // If this field is the foreign key
-                    if ($field->getField() == $currentProperty) {
-                        $pivot = new ForestPivot($currentProperty, $table);
-                        $field->setPivot($pivot);
-                        $field->setReference($reference);
+                var_dump($currentProperty.'//'.$table.'//'.$reference.'//'.$relation);
+                // if the relation is hasOne then we need to create a new field because there's no foreign key to attach it to
+                if ($relation == 'hasOne') {
+                    $field = new ForestField($fieldName, $property['type']);
+                    $pivot = new ForestPivot($currentProperty, $table, $fieldName); // FieldName is the name of the method
+                    $field->setPivot($pivot);
+                    $field->setReference($reference);
+                    $properties[] = $field;
+                } else {
+                    foreach ($properties as $field) {
+
+                        // If this field is the foreign key
+
+                        if ($field->getField() == $currentProperty) {
+                            $pivot = new ForestPivot($currentProperty, $table);
+                            $field->setPivot($pivot);
+                            $field->setReference($reference);
+                        }
                     }
                 }
+
             }
         }
 
@@ -382,27 +396,42 @@ class DatabaseStructure {
 
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
+                                    $this->sendInfo('Case 1');
                                     //Collection or array of models (because Collection is Arrayable)
                                     // in the case of a hasMany there's no foreign key
                                      $this->setProperty(
                                          $method,
                                          $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
-                                         $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+//                                         $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+                                         $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation
                                      );
                                 } elseif ($relation === "morphTo") {
+                                    $this->sendInfo('Case 2');
                                     // Model isn't specified because relation is polymorphic
                                     $this->setProperty(
                                         $method,
                                         '\Illuminate\Database\Eloquent\Model|\Eloquent',
-                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey()
+                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation
                                     );
                                 } else {
+                                    $this->sendInfo('Case 3');
                                     //Single model is returned
+                                    $comment = '';
+                                    if ($relation === "hasOne") {
+                                        $comment = $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation;
+                                        var_dump($comment);
+                                        var_dump($relatedModel);
+                                        var_dump($method);
+                                    } else {
+                                        $comment = $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey().'>'.$relation;
+                                    }
+
                                     $this->setProperty(
                                         $method,
                                         $relatedModel,
-                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey()
+                                        $comment
                                     );
+//                                    $this->sendInfo($relationObj->getOtherKey());
                                 }
                             }
                         }
@@ -479,7 +508,7 @@ class DatabaseStructure {
         $options = [
             'headers' => [
                 'Content-Type' => 'application/json',
-                'forest-secret-key' => '4d737c706cbd622b45820ecfe6669cab36e26ea600df8e35a69b91502cb9749f'
+                'forest-secret-key' => Config::get('forest.SecretKey')
             ],
             'body' => $map
         ];
