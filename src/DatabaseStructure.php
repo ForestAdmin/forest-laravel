@@ -136,7 +136,7 @@ class DatabaseStructure {
                     if (!$reflectionClass->isSubclassOf('Illuminate\Database\Eloquent\Model')) {
                         continue;
                     } else {
-                        $this->sendInfo('Model : '.$name);
+                        $this->sendInfo('Model [ '.$name.']');
                     }
 
                     // If not an abstract class
@@ -243,7 +243,7 @@ class DatabaseStructure {
      *
      * @param $model
      */
-    public function getPropertiesFromTable($model) {
+    protected function getPropertiesFromTable($model) {
         $table = $model->getConnection()->getTablePrefix() . $model->getTable();
         $schema = $model->getConnection()->getDoctrineSchemaManager($table);
         $databasePlatform = $schema->getDatabasePlatform();
@@ -373,22 +373,22 @@ class DatabaseStructure {
                              ) as $relation) {
                         $search = '$this->' . $relation . '(';
                         if ($pos = stripos($code, $search)) {
-                            $this->sendInfo('This is '.$relation);
+                            $this->sendInfo('has relation : '.$relation);
                             //Resolve the relation's model to a Relation object.
                             $relationObj = $model->$method();
 
                             if ($relationObj instanceof Relation) {
-                                $this->sendInfo('It is an instance of Relation');
                                 $relatedModel = '\\' . get_class($relationObj->getRelated());
+
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
                                     // in the case of a hasMany there's no foreign key
-                                    // $this->setProperty(
-                                    //     $method,
-                                    //     $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
-                                    //     $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
-                                    // );
+                                     $this->setProperty(
+                                         $method,
+                                         $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
+                                         $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+                                     );
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $this->setProperty(
