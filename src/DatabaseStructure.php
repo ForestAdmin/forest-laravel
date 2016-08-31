@@ -196,20 +196,18 @@ class DatabaseStructure {
             } else {
                 // Go through the existing properties
                 // (since the properties are first in the array and relation after)
-                var_dump($fieldName.' : '.$property['type']);
                 $foreign = explode('>', $property['comment']);
                 // retrieve the foreign_key name and where it points to
                 list($currentProperty, $table, $reference, $relation, $className) = $foreign;
 
-                var_dump($currentProperty.'//'.$table.'//'.$reference.'//'.$relation.'//'.$className);
                 if ($relation == 'hasOne') {
                     // If it's a hasOne relation then we create a new ForestField
-                    $field = new ForestField($fieldName, $property['type']);
+                    $field = new ForestField($fieldName, ['String']);
                     $pivot = new ForestPivot($currentProperty, $table, $className); // FieldName is the name of the method
                     $field->setPivot($pivot);
                     $field->setReference($currentProperty);
                     $properties[] = $field;
-                } elseif($relation == 'hasMany') {
+                } elseif($relation == 'hasMany' || $relation == 'belongsToMany') {
                     // If it's a hasMany relation then we create a new ForestField
                     $field = new ForestField($fieldName, ['String']);
                     $pivot = new ForestPivot($currentProperty, $table, $className);
@@ -406,18 +404,16 @@ class DatabaseStructure {
                                 $foreignKey = end($foreignKey);
 
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
-                                if ($relation === "hasMany") {
+                                if ($relation === "hasMany" || $relation == "belongsToMany") {
                                     $this->sendInfo('Case 0');
 
                                     $this->setProperty(
                                         $method,
                                         $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
-//                                         $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
                                         $nameClass.'.id>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation.'>'.$nameClass
                                     );
                                 } elseif (in_array($relation, $relations)) {
                                     $this->sendInfo('Case 1');
-//                                    dd($relationObj);
                                     //Collection or array of models (because Collection is Arrayable)
                                     // in the case of a hasMany there's no foreign key
                                      /*$this->setProperty(
@@ -441,9 +437,6 @@ class DatabaseStructure {
 
                                     if ($relation === "hasOne") {
                                         $comment = $nameClass.'.'.$foreignKey.'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation.'>'.$nameClass;
-                                        var_dump($comment);
-                                        var_dump($relatedModel);
-                                        var_dump($method);
                                     } else {
                                         $comment = $nameClass.'.'.$foreignKey.'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey().'>'.$relation.'>'.$nameClass;
                                     }
@@ -453,7 +446,6 @@ class DatabaseStructure {
                                         $relatedModel,
                                         $comment
                                     );
-//                                    $this->sendInfo($relationObj->getOtherKey());
                                 }
                             }
                         }
