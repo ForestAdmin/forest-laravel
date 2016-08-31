@@ -31,7 +31,7 @@ class LianaController extends Controller
         } catch (CollectionNotFoundException $exc) {
             return Response::make('Collection not found', 404);
         }
-
+        
         return $this->returnJson($resource);
     }
 
@@ -48,7 +48,7 @@ class LianaController extends Controller
             $filter = new ResourceFilter($request->all());
             $resources = $liana->listResources($modelName, $filter);
         } catch (CollectionNotFoundException $exc) {
-            return new Response('Collection not Found', 404);
+            return Response::make('Collection not found', 404);
         }
 
         return $this->returnJson($resources);
