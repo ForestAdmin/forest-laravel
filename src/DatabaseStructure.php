@@ -199,23 +199,28 @@ class DatabaseStructure {
                 var_dump($fieldName.' : '.$property['type']);
                 $foreign = explode('>', $property['comment']);
                 // retrieve the foreign_key name and where it points to
-                list($currentProperty, $table, $reference, $relation) = $foreign;
+                list($currentProperty, $table, $reference, $relation, $className) = $foreign;
 
-                var_dump($currentProperty.'//'.$table.'//'.$reference.'//'.$relation);
-                // if the relation is hasOne then we need to create a new field because there's no foreign key to attach it to
+                var_dump($currentProperty.'//'.$table.'//'.$reference.'//'.$relation.'//'.$className);
                 if ($relation == 'hasOne') {
+                    // If it's a hasOne relation then we create a new ForestField
                     $field = new ForestField($fieldName, $property['type']);
-                    $pivot = new ForestPivot($currentProperty, $table, $fieldName); // FieldName is the name of the method
+                    $pivot = new ForestPivot($currentProperty, $table, $className); // FieldName is the name of the method
                     $field->setPivot($pivot);
-                    $field->setReference($reference);
+                    $field->setReference($currentProperty);
+                    $properties[] = $field;
+                } elseif($relation == 'hasMany') {
+                    // If it's a hasMany relation then we create a new ForestField
+                    $field = new ForestField($fieldName, ['String']);
+                    $pivot = new ForestPivot($currentProperty, $table, $className);
+                    $field->setPivot($pivot);
+                    $field->setReference($currentProperty);
                     $properties[] = $field;
                 } else {
                     foreach ($properties as $field) {
-
-                        // If this field is the foreign key
-
+                        // If this field is the foreign key we attach the data
                         if ($field->getField() == $currentProperty) {
-                            $pivot = new ForestPivot($currentProperty, $table);
+                            $pivot = new ForestPivot($currentProperty, $table, $className);
                             $field->setPivot($pivot);
                             $field->setReference($reference);
                         }
@@ -393,37 +398,54 @@ class DatabaseStructure {
 
                             if ($relationObj instanceof Relation) {
                                 $relatedModel = '\\' . get_class($relationObj->getRelated());
+                                $entityClassNameExploded = explode('\\', get_class($relationObj->getRelated()));
+                                $nameClass = strtolower(end($entityClassNameExploded));
+
+                                $tableAndForeignKey = $relationObj->getForeignKey();
+                                $foreignKey = explode('.', $tableAndForeignKey);
+                                $foreignKey = end($foreignKey);
 
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
-                                if (in_array($relation, $relations)) {
+                                if ($relation === "hasMany") {
+                                    $this->sendInfo('Case 0');
+
+                                    $this->setProperty(
+                                        $method,
+                                        $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
+//                                         $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
+                                        $nameClass.'.id>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation.'>'.$nameClass
+                                    );
+                                } elseif (in_array($relation, $relations)) {
                                     $this->sendInfo('Case 1');
+//                                    dd($relationObj);
                                     //Collection or array of models (because Collection is Arrayable)
                                     // in the case of a hasMany there's no foreign key
-                                     $this->setProperty(
+                                     /*$this->setProperty(
                                          $method,
                                          $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
 //                                         $relationObj->getForeignKey().'>'.$method.'.'.$relationObj->getOtherKey()
                                          $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation
-                                     );
+                                     );*/
                                 } elseif ($relation === "morphTo") {
                                     $this->sendInfo('Case 2');
                                     // Model isn't specified because relation is polymorphic
-                                    $this->setProperty(
-                                        $method,
-                                        '\Illuminate\Database\Eloquent\Model|\Eloquent',
-                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation
-                                    );
+//                                    $this->setProperty(
+//                                        $method,
+//                                        '\Illuminate\Database\Eloquent\Model|\Eloquent',
+//                                        $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation
+//                                    );
                                 } else {
                                     $this->sendInfo('Case 3');
                                     //Single model is returned
                                     $comment = '';
+
                                     if ($relation === "hasOne") {
-                                        $comment = $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation;
+                                        $comment = $nameClass.'.'.$foreignKey.'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation.'>'.$nameClass;
                                         var_dump($comment);
                                         var_dump($relatedModel);
                                         var_dump($method);
                                     } else {
-                                        $comment = $relationObj->getForeignKey().'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey().'>'.$relation;
+                                        $comment = $nameClass.'.'.$foreignKey.'>'.$relationObj->getModel()->getTable().'>'.$method.'.'.$relationObj->getOtherKey().'>'.$relation.'>'.$nameClass;
                                     }
 
                                     $this->setProperty(
