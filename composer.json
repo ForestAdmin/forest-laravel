@@ -1,6 +1,8 @@
 {
   "name": "forestadmin/forest-laravel",
-  "description": "Liana is part of the ForestAdmin project. This library analyzes the database structure of an application and restitutes a map of it.",
+  "description": "Official Laravel Liana for Forest",
+  "version": "0.0.1",
+  "license": "GNU GPLv3",
   "type": "library",
   "require": {
     "psecio/jwt": "^1.7",
