@@ -216,6 +216,9 @@ class DatabaseStructure {
                     $properties[] = $field;
                 } else {
                     foreach ($properties as $field) {
+                        $currentProperty = explode('.', $currentProperty);
+                        $currentProperty = end($currentProperty);
+
                         // If this field is the foreign key we attach the data
                         if ($field->getField() == $currentProperty) {
                             $pivot = new ForestPivot($currentProperty, $table, $className);
