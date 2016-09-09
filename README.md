@@ -15,7 +15,7 @@ following commands to download the latest stable version of this package:
 
 ```bash
 $ composer require forestadmin/forest-php dev-master
-$ composer require forestadmin/forest-symfony
+$ composer require forestadmin/forest-laravel
 ```
 
 This command requires you to have Composer installed globally, as explained

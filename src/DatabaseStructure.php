@@ -281,44 +281,33 @@ class DatabaseStructure {
             foreach ($columns as $column) {
                 $name = $column->getName();
 
-                if (in_array($name, $model->getDates())) {
-                    $type = '\Carbon\Carbon';
-                } else {
-                    $type = $column->getType()->getName();
-                    switch ($type) {
-                        case 'string':
-                        case 'text':
-                        case 'date':
-                        case 'time':
-                        case 'guid':
-                        case 'datetimetz':
-                        case 'datetime':
-                            $type = 'string';
-                            break;
-                        case 'integer':
-                        case 'bigint':
-                        case 'smallint':
-                            $type = 'integer';
-                            break;
-                        case 'decimal':
-                        case 'float':
-                            $type = 'float';
-                            break;
-                        case 'boolean':
-                            $type = 'boolean';
-                            break;
-                        default:
-                            $type = 'mixed';
-                            break;
-                    }
+                $type = $column->getType()->getName();
+                switch ($type) {
+                    case 'datetimetz':
+                    case 'date':
+                    case 'time':
+                    case 'datetime':
+                        $type = 'Date';
+                        break;
+                    case 'integer':
+                    case 'bigint':
+                    case 'smallint':
+                    case 'decimal':
+                    case 'float':
+                        $type = 'Number';
+                        break;
+                    case 'boolean':
+                        $type = 'Boolean';
+                        break;
+                    case 'guid':
+                    case 'string':
+                    case 'text':
+                    default:
+                        $type = 'String';
+                        break;
                 }
-                $comment = $column->getComment();
+
                 $this->setProperty($name, $type, '');
-                $this->setMethod(
-                    Str::camel("where_" . $name),
-                    '\Illuminate\Database\Query\Builder|\\' . get_class($model),
-                    array('$value')
-                );
             }
         }
     }
@@ -559,9 +548,14 @@ class DatabaseStructure {
      */
     protected static function getApimapMeta()
     {
+        // Retrieve version of the package from the composer file
+        $path = getcwd().'/vendor/forestadmin/forest-laravel/';
+        $composerFile = file_get_contents($path.'composer.json');
+        $composerFile = json_decode($composerFile);
+
         return [
-            'liana' => Config::get('forest.Liana'),
-            'liana_version' => Config::get('forest.LianaVersion')
+            'liana' => 'forest-laravel',
+            'liana_version' => $composerFile->version
         ];
     }
 }
