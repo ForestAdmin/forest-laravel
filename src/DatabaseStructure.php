@@ -209,7 +209,7 @@ class DatabaseStructure {
                     $properties[] = $field;
                 } elseif($relation == 'hasMany' || $relation == 'belongsToMany') {
                     // If it's a hasMany relation then we create a new ForestField
-                    $field = new ForestField($fieldName, ['String']);
+                    $field = new ForestField($fieldName, [$property['type']]);
                     $pivot = new ForestPivot($currentProperty, $table, $className);
                     $field->setPivot($pivot);
                     $field->setReference($currentProperty);
@@ -404,10 +404,24 @@ class DatabaseStructure {
                                 if ($relation === "hasMany" || $relation == "belongsToMany") {
                                     $this->sendInfo('Case 0');
 
+                                    $keyOfRelated = $relationObj->getRelated()->getKey();
+
+                                    // Retrieve the type of the primary key
+                                    $typeOfRelated = 'Number';
+                                    $casts = $relationObj->getRelated()->getCasts();
+                                    foreach ($casts as $key => $type) {
+                                        if ($key == $keyOfRelated) {
+                                            if ($type != 'int') {
+                                                $typeOfRelated = 'String';
+                                            }
+                                        }
+                                    }
+
+
                                     $this->setProperty(
                                         $method,
-                                        $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
-                                        $nameClass.'.id>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation.'>'.$nameClass
+                                        $typeOfRelated,
+                                        $nameClass.'.'.$keyOfRelated.'>'.$relationObj->getModel()->getTable().'>'.$method.'>'.$relation.'>'.$nameClass
                                     );
                                 } elseif (in_array($relation, $relations)) {
                                     $this->sendInfo('Case 1');
