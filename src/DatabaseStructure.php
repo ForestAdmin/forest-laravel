@@ -218,12 +218,17 @@ class DatabaseStructure {
                     foreach ($properties as $field) {
                         $currentProperty = explode('.', $currentProperty);
                         $currentProperty = end($currentProperty);
-
+                        
+                        // Retrieve relationship's method name
+                        $methodName = explode('.', $reference);
+                        $methodName = $methodName[0];
                         // If this field is the foreign key we attach the data
                         if ($field->getField() == $currentProperty) {
                             $pivot = new ForestPivot($currentProperty, $table, $className);
                             $field->setPivot($pivot);
                             $field->setReference($reference);
+                            // Rename the field with the relation methods name instead of the foreign_key name
+                            $field->setField($methodName);
                         }
                     }
                 }
