@@ -329,37 +329,7 @@ class DatabaseStructure {
 
             foreach ($methods as $method) {
 
-                if (Str::startsWith($method, 'get') && Str::endsWith(
-                        $method,
-                        'Attribute'
-                    ) && $method !== 'getAttribute'
-                ) {
-                    //Magic get<name>Attribute
-                    $name = Str::snake(substr($method, 3, -9));
-                    if (!empty($name)) {
-                        $this->setProperty($name, null, '');
-                    }
-                } elseif (Str::startsWith($method, 'set') && Str::endsWith(
-                        $method,
-                        'Attribute'
-                    ) && $method !== 'setAttribute'
-                ) {
-                    //Magic set<name>Attribute
-                    $name = Str::snake(substr($method, 3, -9));
-                    if (!empty($name)) {
-                        $this->setProperty($name, null, '');
-                    }
-                } elseif (Str::startsWith($method, 'scope') && $method !== 'scopeQuery') {
-                    //Magic set<name>Attribute
-                    $name = Str::camel(substr($method, 5));
-                    if (!empty($name)) {
-                        $reflection = new \ReflectionMethod($model, $method);
-                        $args = $this->getParameters($reflection);
-                        //Remove the first ($query) argument
-                        array_shift($args);
-                        $this->setMethod($name, '\Illuminate\Database\Query\Builder|\\' . $reflection->class, $args);
-                    }
-                } elseif (!method_exists('Illuminate\Database\Eloquent\Model', $method)
+                if (!method_exists('Illuminate\Database\Eloquent\Model', $method)
                     && !Str::startsWith($method, 'get')
                 ) {
                     //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
