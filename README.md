@@ -80,13 +80,13 @@ Step 3.2 : Configuration `config/forest.php`
 Generate a secret key for your application on http://forestadmin.com, and paste it in you `forest.php` file.
 
 ```
-    'SecretKey' => 'SecretKeyGeneratedFromForestAdminWebsite',
+    'SecretKey' => '...', // given by Forest.
 ```
 
 Also, add your pass phrase to the Forest config:
 
 ```
-    'AuthKey' => 'YourSecretKey',
+    'AuthKey' => 'ChooseARandomString',
 ```
 
 Step 4: Database mapping
