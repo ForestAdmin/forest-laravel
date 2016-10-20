@@ -1,105 +1,78 @@
-About
-=====
+<!-- https://github.com/the-control-group/voyager -->
 
-The ForestBundle allows you to use the ForestAdmin application to manage your database entities. 
-If you don't know what ForestAdmin is, you can [follow this link](http://www.forestadmin.com)
+# Forest Laravel Liana
 
-Installation
-============
+The official Laravel liana for Forest.  
+Forest is a modern admin interface (see the [live demo](https://app.forestadmin.com/login?livedemo)) that works on all major web frameworks.
+forestadmin/forest-laravel is the package that makes Forest admin work on any Laravel application.
 
-Step 1: Install the Package
----------------------------
+## Installation
 
-Open a command console, enter your project directory and execute the
-following commands to download the latest stable version of this package:
+Visit [Forest's website](http://www.forestadmin.com), enter your email and click "Get started".  
+You will then follow a 4-step process (also available in this 1 min [video](https://www.youtube.com/watch?v=ZTrMnidWLoM)):
 
-```bash
-$ composer require forestadmin/forest-php dev-master
-$ composer require forestadmin/forest-laravel dev-master
-```
+1. Choose your stack (Laravel)
+2. Install Forest Liana
+  ```bash
+  ## Install the forest-laravel package
+  composer require forestadmin/forest-laravel
+  ```
+  Next, add the service provider to `config/app.php`
 
-This command requires you to have Composer installed globally, as explained
-in the [installation chapter](https://getcomposer.org/doc/00-intro.md) of the Composer documentation.
+  ```
+  ForestAdmin\ForestLaravel\ForestServiceProvider::class,
+  ```
 
-Next, add the service provider to `config/app.php`
+  Still in the console, enter this command to install the config file in  the `config/` directory.
 
-```
-ForestAdmin\ForestLaravel\ForestServiceProvider::class,
-```
+  ```
+  php artisan vendor:publish
+  ```
 
-Step 2: Allow CORS Queries from ForestAdmin
--------------------------------------------
+  Generate a secret key for your application on http://forestadmin.com, and
+  configure the `config/forest.php` file like this:
 
-To allow Forest to communicate successfully with your application, you will
-need to authorize it to do Cross-Origin Resource Sharing (CORS) Queries.
-If you do not know how it works, follow these instructions:
+  ```
+  return [
+    'secret_key' => 'YOUR-SUPER-SECRET-SECRET-KEY',
+    'auth_key' => 'YOUR-SUPER-SECRET-AUTH-KEY',
+    'models_path' => 'app/models'
+  ];
+  ```
 
-First, install a CORS package, for example NelmioCorsBundle:
+  Finally, you need to generate a mapping of your database schema and send it to http://forestadmin.com running the following command:
 
-```
-$ composer require barryvdh/laravel-cors
-```
+   ```
+   $ php artisan forest:send-apimap
+   ```
 
-Next, add the service provider to `config/app.php`
 
-```
-Barryvdh\Cors\ServiceProvider::class,
-```
+3. Get your app running, provide your application URL and check if you have successfully installed Forest Liana on your app.  
+4. Choose your credentials, log into https://app.forestadmin.com and start customizing your admin interface! 🎉
 
-Step 3: Configuration
----------------------
+**NOTE: If you’re stuck, can’t get something working or need some help, feel free to contact the Forest team at support@forestadmin.com**
 
-Still in the console, enter this command to install the config file in  the `config/` directory.
- 
-```
-php artisan vendor:publish
-```
+## How it works
 
-Two files should've been added `config/forest.php` and `config/cors.php`
+Installing forestadmin/forest-laravel into your app will automatically generate an admin REST API for your app.  
+This API allows the Forest admin UI to communicate with your app and operate on your data.  
+Note that data from your app will never reach Forest's servers. Only your UI configuration is saved.  
+As this package is open-source, you're free to extend the admin REST API for any operation specific to your app.  
 
-Step 3.1 : Configuration `config/cors.php`
-------------------------------------------
+## How to contribute
 
-This configuration files should looks like the following code :
+This liana is officially maintained by Forest.  
+We're always happy to get contributions for other fellow lumberjacks.  
+All contributions will be reviewed by Forest's team before being merged into master.
 
-```
-return [
-    'supportsCredentials' => false,
-    'allowedOrigins' => ["http://app.forestadmin.com", "https://app.forestadmin.com"],
-    'allowedHeaders' => ['*'],
-    'allowedMethods' => ['POST', 'PUT', 'GET', 'DELETE'],
-    'exposedHeaders' => [],
-    'maxAge' => 0,
-    'hosts' => [],
-];
-```
+Here is the contribution workflow:
 
-Step 3.2 : Configuration `config/forest.php`
---------------------------------------------
+1. **Fork** the repo on GitHub
+2. **Clone** the project to your own machine
+3. **Commit** changes to your own branch
+4. **Push** your work back up to your fork
+5. Submit a **Pull request** so that we can review your changes
 
-Generate a secret key for your application on http://forestadmin.com, and paste it in you `forest.php` file.
+## Licence
 
-```
-    'SecretKey' => '...', // given by Forest.
-```
-
-Also, add your pass phrase to the Forest config:
-
-```
-    'AuthKey' => 'ChooseARandomString',
-```
-
-Step 4: Database mapping
-------------------------
-
-Now, you need to generate a mapping of your database and send it to http://forestadmin.com. 
-To do so, you just have to run the following command
- 
- ```
- $ php artisan forest:postmap
- ```
-
-This command should be run each time that you make modification in your database's structure. (Not when a new data is inserted)
-Mainly, whenever you run a `php artisan migrate` you should run the command above after.
-
-Right now, I didn't found a way to automate this process. If you have an idea, contact me ;)
+[GPL v3](https://github.com/ForestAdmin/forest-rails/blob/master/LICENSE)
