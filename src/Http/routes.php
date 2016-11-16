@@ -1,21 +1,27 @@
 <?php
 
-use Illuminate\Routing\Router;
+Route::group(['prefix' => 'forest', 'middleware' => 'cors'], function () {
+    $namespace = '\ForestAdmin\ForestLaravel\Http\Controllers';
+    Route::get('/', $namespace.'\ApimapController@index');
+    Route::post('sessions', $namespace.'\SessionController@create');
 
-Route::group(['middleware' => 'cors'], function(Router $router) {
-    $spacename = "\ForestAdmin\ForestLaravel\Http\Controllers";
+    Route::group(['middleware' => 'auth.forest'], function () {
+        $namespace = '\ForestAdmin\ForestLaravel\Http\Controllers';
 
-    Route::get('forest', $spacename.'\ForestController@index');
-    Route::post('forest/sessions', $spacename.'\ForestController@sessions');
+        // Records
+        Route::get('{modelName}', $namespace.'\ResourcesController@index');
+        Route::post('{modelName}', $namespace.'\ResourcesController@create');
+        Route::get('{modelName}/{recordId}', $namespace.'\ResourcesController@show');
+        Route::put('{modelName}/{recordId}', $namespace.'\ResourcesController@update');
+        Route::delete('{modelName}/{recordId}', $namespace.'\ResourcesController@destroy');
 
-    Route::get('forest/{modelName}/{recordId}', $spacename.'\LianaController@getResource');
-    Route::get('forest/{modelName}', $spacename.'\LianaController@listResources');
-    Route::get('forest/{modelName}/{recordId}/{associationName}', $spacename.'\LianaController@getHasMany');
+        // Associations
+        Route::get('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@index');
+        Route::put('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@update');
+        Route::post('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@associate');
+        Route::delete('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@dissociate');
 
-    Route::post('forest/{modelName}', $spacename.'\LianaController@createResource');
-    Route::put('forest/{modelName}/{recordId}', $spacename.'\LianaController@updateResource');
-
-    // Delete ?
-//    Route::delete('forest/{modelName}/{recordId}', $spacename.'\LianaController@deleteResource');
+        // Stats
+        Route::post('stats/{modelName}', $namespace.'\StatsController@show');
+    });
 });
-
