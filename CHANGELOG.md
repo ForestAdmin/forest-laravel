@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## RELEASE 0.0.2 - 2016-11-16
 ### Added
 - Charts - Support all kind of charts (value, pie, line).
 - Search - Support search in the records lists.
