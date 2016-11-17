@@ -14,7 +14,6 @@ You will then follow a 4-step process:
 1. Choose your stack (Laravel)
 2. Install Forest Liana
   ```bash
-  ## Install the forest-laravel package
   composer require forestadmin/forest-laravel
   ```
   Next, add the service provider to `config/app.php`
