@@ -9,7 +9,7 @@ forestadmin/forest-laravel is the package that makes Forest admin work on any La
 ## Installation
 
 Visit [Forest's website](http://www.forestadmin.com), enter your email and click "Get started".  
-You will then follow a 4-step process (also available in this 1 min [video](https://www.youtube.com/watch?v=ZTrMnidWLoM)):
+You will then follow a 4-step process:
 
 1. Choose your stack (Laravel)
 2. Install Forest Liana
