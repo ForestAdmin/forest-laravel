@@ -2,7 +2,7 @@
 
 namespace ForestAdmin\ForestLaravel\Serializer\JsonApi;
 
-class Resource extends response {
+class Resource extends Response {
     protected $primary_type = null;
     protected $primary_id = null;
     protected $primary_attributes = array();
