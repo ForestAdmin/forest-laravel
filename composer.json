@@ -1,7 +1,7 @@
 {
   "name": "forestadmin/forest-laravel",
   "description": "Official Laravel Liana for Forest",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "GNU GPLv3",
   "keywords": ["forest", "admin"],
   "type": "library",

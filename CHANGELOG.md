@@ -1,5 +1,9 @@
 # Change Log
 
+## RELEASE 0.0.3 - 2016-11-18
+### Fixed
+- Serialization - Fix the serialization regression due to a typo on a class name.
+
 ## RELEASE 0.0.2 - 2016-11-16
 ### Added
 - Charts - Support all kind of charts (value, pie, line).
