@@ -1,8 +1,8 @@
 # Change Log
 
-## [Unreleased]
+## RELEASE 0.0.4 - 2016-12-01
 ### Fixed
-- HasTo Associations - Fix the display of collections having hasOne associations.
+- HasOne Associations - Fix the retrieval of collections having hasOne associations.
 
 ## RELEASE 0.0.3 - 2016-11-18
 ### Added
