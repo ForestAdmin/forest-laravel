@@ -1,5 +1,11 @@
 # Change Log
 
+## [Unreleased]
+
+## RELEASE 0.0.5 - 2016-12-02
+### Added
+- Line Charts - Support line charts using MySQL databases.
+
 ## RELEASE 0.0.4 - 2016-12-01
 ### Fixed
 - HasOne Associations - Fix the retrieval of collections having hasOne associations.
