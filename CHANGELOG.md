@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.7 - 2016-12-02
 ### Added
 - Pie Charts - Support group by on belongsTo associations.
 
