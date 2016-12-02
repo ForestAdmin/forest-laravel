@@ -2,9 +2,24 @@
   "name": "forestadmin/forest-laravel",
   "description": "Official Laravel Liana for Forest",
   "version": "0.0.6",
-  "license": "GNU GPLv3",
-  "keywords": ["forest", "admin"],
   "type": "library",
+  "keywords": ["forest", "laravel", "admin", "panel", "interface"],
+  "homepage": "http://www.forestadmin.com",
+  "license": "GNU GPLv3",
+  "authors": [
+    {
+      "name": "Arnaud Besnier",
+      "email": "arnaudibesnier@gmail.com"
+    },
+    {
+      "name": "Ludovic Esmanne",
+      "email": "lesmanne@gmail.com"
+    }
+  ],
+  "support": {
+      "issues": "https://github.com/ForestAdmin/forest-laravel/issues",
+      "source": "https://github.com/ForestAdmin/forest-laravel"
+  },
   "require": {
     "guzzlehttp/guzzle": "^6.2",
     "neomerx/json-api": "^0.8.10",
@@ -16,16 +31,6 @@
   "require-dev": {
     "phpunit/phpunit": "4.8.0"
   },
-  "authors": [
-    {
-      "name": "Arnaud Besnier",
-      "email": "arnaudibesnier@gmail.com"
-    },
-    {
-      "name": "Ludovic Esmanne",
-      "email": "lesmanne@gmail.com"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "ForestAdmin\\ForestLaravel\\" : "src"
