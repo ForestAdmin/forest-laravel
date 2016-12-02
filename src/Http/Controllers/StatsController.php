@@ -19,13 +19,16 @@ class StatsController extends ApplicationController {
         if ($this->modelResource) {
             switch($params['type']) {
                 case 'Value':
-                    $getter = new StatValueGetter($this->modelResource, $params);
+                    $getter = new StatValueGetter($this->modelResource, $params,
+                      $this->schemaResource);
                     break;
                 case 'Pie':
-                    $getter = new StatPieGetter($this->modelResource, $params);
+                    $getter = new StatPieGetter($this->modelResource, $params,
+                      $this->schemaResource);
                     break;
                 case 'Line':
-                    $getter = new StatLineGetter($this->modelResource, $params);
+                    $getter = new StatLineGetter($this->modelResource, $params,
+                      $this->schemaResource);
                     break;
             }
 

@@ -1,6 +1,11 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Chart Filters - Support chart filters on belongsTo associations.
+
+### Fixed
+- Charts - Fix potential ambiguous aggregation field.
 
 ## RELEASE 0.0.5 - 2016-12-02
 ### Added
