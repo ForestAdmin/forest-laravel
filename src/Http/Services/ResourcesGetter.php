@@ -62,7 +62,6 @@ class ResourcesGetter {
                 // NOTICE: HasOne Relationship
                 $foreignKeyExploded = explode('.', $foreignKey);
                 $foreignKey = end($foreignKeyExploded);
-                $query->addSelect('post_id');
                 $query->leftJoin($tableNameAssociation.' AS t'.$i,
                   $this->tableNameModel.'.id', '=', 't'.$i.'.'.$foreignKey);
             } else {
