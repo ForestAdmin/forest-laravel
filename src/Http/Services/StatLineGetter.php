@@ -13,14 +13,17 @@ class StatLineGetter {
     protected $aggregateField;
     protected $filters;
     protected $filterType;
+    protected $collectionSchema;
 
     private $currentDate;
     public $values;
 
-    public function __construct($model, $params) {
+    public function __construct($model, $params, $collectionSchema) {
         $this->model = $model;
+        $this->collectionSchema = $collectionSchema;
         $this->tableNameModel = $this->model->getTable();
-        $this->groupByDateField = $params['group_by_date_field'];
+        $this->groupByDateField = '"'.$this->tableNameModel.'"."'.
+          $params['group_by_date_field'].'"';
         $this->timeRange = strtolower($params['time_range']);
         $this->aggregateType = strtolower($params['aggregate']);
 
@@ -54,6 +57,7 @@ class StatLineGetter {
           ->groupBy('date')
           ->orderBy('date', 'ASC');
 
+        $this->addJoins($query);
         $this->addFilters($query);
 
         $results = $query->get();
@@ -84,8 +88,34 @@ class StatLineGetter {
                     break;
             }
         } else {
-            return \DB::raw('to_char(date_trunc(\''.$this->timeRange.'\', "'.
-              $this->groupByDateField.'"), \'YYYY-MM-DD 00:00:00\') as date');
+            return \DB::raw('to_char(date_trunc(\''.$this->timeRange.'\', '.
+              $this->groupByDateField.'), \'YYYY-MM-DD 00:00:00\') as date');
+        }
+    }
+
+    protected function getIncludes() {
+        return $this->collectionSchema->getFieldNamesToOne();
+    }
+
+    protected function addJoins($query) {
+        foreach($this->getIncludes() as $i => $field) {
+            $foreignKey = $this->model->{$field->getField()}()->getForeignKey();
+            $tableNameAssociation = SchemaUtils::findResource(
+              $field->getReferencedModelName())->getTable();
+
+            if ($field->getInverseOf()) {
+                // NOTICE: HasOne Relationship
+                $foreignKeyExploded = explode('.', $foreignKey);
+                $foreignKey = end($foreignKeyExploded);
+                $query->leftJoin($tableNameAssociation.' AS t'.$i,
+                  $this->tableNameModel.'.id', '=', 't'.$i.'.'.$foreignKey);
+            } else {
+                // NOTICE: BelongsTo relationship
+                $query->leftJoin($tableNameAssociation.' AS t'.$i,
+                  $this->tableNameModel.'.'.$foreignKey, '=', 't'.$i.'.id');
+            }
+
+            $this->fieldTableNames[$field->getField()] = 't'.$i;
         }
     }
 
@@ -96,13 +126,14 @@ class StatLineGetter {
                     $field = $this->tableNameModel.'.'.$filter['field'];
                 } else {
                     $fieldExploded = explode(':', $filter['field']);
-                    $field = implode('s.', $fieldExploded);
+                    $field = $this->fieldTableNames[reset($fieldExploded)].
+                      '.'.end($fieldExploded);
                 }
 
                 $values = explode(',', $filter['value']);
                 foreach($values as $value) {
                     ConditionSetter::perform($query, $this->filterType,
-                      $filter['field'], $value);
+                      $field, $value);
                 }
             }
         }
