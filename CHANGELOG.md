@@ -1,6 +1,10 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- HasTo Associations - Fix the display of collections having hasOne associations.
+
+## RELEASE 0.0.3 - 2016-11-18
 ### Added
 - Charts - Support all kind of charts (value, pie, line).
 - Search - Support search in the records lists.

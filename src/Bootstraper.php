@@ -133,7 +133,7 @@ class Bootstraper {
                                 $fields[] = new Field($method, ["Number"],
                                   $nameClass.".id");
                             } elseif ($relation == 'hasOne') {
-                                $fields[] = new Field($nameClass, "Number",
+                                $fields[] = new Field($method, "Number",
                                   $nameClass.".id", $modelName);
                             } elseif ($relation == 'belongsTo') {
                                 $fields[] = new Field($method, "Number",
