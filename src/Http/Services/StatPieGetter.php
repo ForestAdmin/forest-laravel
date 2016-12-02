@@ -20,9 +20,18 @@ class StatPieGetter {
         $this->model = $model;
         $this->collectionSchema = $collectionSchema;
         $this->tableNameModel = $this->model->getTable();
-        $this->groupByField = $this->tableNameModel.'.'.
-          strtolower($params['group_by_field']);
         $this->aggregateType = strtolower($params['aggregate']);
+
+        $this->setFieldTableNames();
+
+        if (strpos($params['group_by_field'], ':') === false) {
+            $this->groupByField = $this->tableNameModel.'.'.
+              strtolower($params['group_by_field']);
+        } else {
+            $groupByFieldExploded = explode(':', $params['group_by_field']);
+            $this->groupByField = $this->fieldTableNames[
+              reset($groupByFieldExploded)].'.'.end($groupByFieldExploded);
+        }
 
         if (array_key_exists('aggregate_field', $params)) {
             $this->aggregateField = $this->tableNameModel.'.'.
@@ -67,6 +76,12 @@ class StatPieGetter {
         return $this->collectionSchema->getFieldNamesToOne();
     }
 
+    protected function setFieldTableNames() {
+      foreach($this->getIncludes() as $i => $field) {
+          $this->fieldTableNames[$field->getField()] = 't'.$i;
+      }
+    }
+
     protected function addJoins($query) {
         foreach($this->getIncludes() as $i => $field) {
             $foreignKey = $this->model->{$field->getField()}()->getForeignKey();
@@ -84,8 +99,6 @@ class StatPieGetter {
                 $query->leftJoin($tableNameAssociation.' AS t'.$i,
                   $this->tableNameModel.'.'.$foreignKey, '=', 't'.$i.'.id');
             }
-
-            $this->fieldTableNames[$field->getField()] = 't'.$i;
         }
     }
 
