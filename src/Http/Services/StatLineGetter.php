@@ -3,6 +3,7 @@
 namespace ForestAdmin\ForestLaravel\Http\Services;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Config;
 
 class StatLineGetter {
     protected $model;
@@ -61,9 +62,31 @@ class StatLineGetter {
     }
 
     protected function getGroupByDateInterval() {
-        // TODO: Support the date interval on mySQL.
-        return \DB::raw('to_char(date_trunc(\''.$this->timeRange.'\', "'.
-          $this->groupByDateField.'"), \'YYYY-MM-DD 00:00:00\') as date');
+        if (Config::get('database.default') === 'mysql') {
+            switch ($this->timeRange) {
+                case 'day':
+                    return \DB::raw('DATE_FORMAT('.$this->groupByDateField.
+                      ', \'%Y-%m-%d 00:00:00\') as date');
+                    break;
+                case 'week':
+                    return \DB::raw('DATE_FORMAT(DATE_SUB('.
+                      $this->groupByDateField.', INTERVAL ((7 + WEEKDAY'.
+                      '('.$this->groupByDateField.')) % 7) DAY), '.
+                      '\'%Y-%m-%d 00:00:00\') as date');
+                    break;
+                case 'month':
+                    return \DB::raw('DATE_FORMAT('.$this->groupByDateField.
+                      ', \'%Y-%m-01 00:00:00\') as date');
+                    break;
+                case 'year':
+                    return \DB::raw('DATE_FORMAT('.$this->groupByDateField.
+                      ', \'%Y-01-01 00:00:00\') as date');
+                    break;
+            }
+        } else {
+            return \DB::raw('to_char(date_trunc(\''.$this->timeRange.'\', "'.
+              $this->groupByDateField.'"), \'YYYY-MM-DD 00:00:00\') as date');
+        }
     }
 
     protected function addFilters($query) {
