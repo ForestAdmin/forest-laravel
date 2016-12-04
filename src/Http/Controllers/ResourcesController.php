@@ -72,6 +72,10 @@ class ResourcesController extends ApplicationController {
             try {
                 $record = $this->modelResource->findOrFail($recordId);
                 $record = $this->setAttributes($record, $request, true);
+
+                // NOTICE: Enforce updated_at timestamp
+                $record->touch();
+
                 return ResourcesSerializer::returnJsonRecord(
                   $this->modelResource, $this->schemaResource, $modelName,
                   $record);
