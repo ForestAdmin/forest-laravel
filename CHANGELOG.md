@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.8 - 2016-12-03
 ### Fixed
 - Record Update - Do not set date fields if the value sent is null.
 - Record Update - Update the updated_at timestamp on record update.
