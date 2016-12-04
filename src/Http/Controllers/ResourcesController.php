@@ -123,7 +123,7 @@ class ResourcesController extends ApplicationController {
             if (array_key_exists($fieldName, $content['attributes'])) {
                 $valueNew = $content['attributes'][$fieldName];
 
-                if ($field->getType() == 'Date') {
+                if ($field->getType() == 'Date' && !($valueNew === NULL)) {
                     $valueNew = Carbon::instance(new DateTime($valueNew));
                 }
                 $record->{$fieldName} = $valueNew;
