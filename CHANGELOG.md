@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.9 - 2016-12-04
 ### Fixed
 - Charts - Fix a regression that broke charts using MySQL.
 
