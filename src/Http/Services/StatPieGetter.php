@@ -59,7 +59,7 @@ class StatPieGetter {
         }
 
         $query = $this->model
-          ->select(\DB::raw($this->groupByField.' as key'),
+          ->select($this->groupByField.' as key',
             \DB::raw($aggregation.' as value'))
           ->groupBy($this->groupByField)
           ->orderBy('value', 'DESC');

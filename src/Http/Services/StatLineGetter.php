@@ -22,8 +22,7 @@ class StatLineGetter {
         $this->model = $model;
         $this->collectionSchema = $collectionSchema;
         $this->tableNameModel = $this->model->getTable();
-        $this->groupByDateField = '"'.$this->tableNameModel.'"."'.
-          $params['group_by_date_field'].'"';
+        $this->groupByDateField = $params['group_by_date_field'];
         $this->timeRange = strtolower($params['time_range']);
         $this->aggregateType = strtolower($params['aggregate']);
 
@@ -67,6 +66,8 @@ class StatLineGetter {
 
     protected function getGroupByDateInterval() {
         if (Config::get('database.default') === 'mysql') {
+            $this->groupByDateField = '`'.$this->tableNameModel.'`.`'.
+              $this->groupByDateField.'`';
             switch ($this->timeRange) {
                 case 'day':
                     return \DB::raw('DATE_FORMAT('.$this->groupByDateField.
@@ -88,6 +89,8 @@ class StatLineGetter {
                     break;
             }
         } else {
+            $this->groupByDateField = '"'.$this->tableNameModel.'"."'.
+              $this->groupByDateField.'"';
             return \DB::raw('to_char(date_trunc(\''.$this->timeRange.'\', '.
               $this->groupByDateField.'), \'YYYY-MM-DD 00:00:00\') as date');
         }
