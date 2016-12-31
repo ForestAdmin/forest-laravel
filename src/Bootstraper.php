@@ -188,7 +188,7 @@ class Bootstraper {
 
     protected function getApimapMeta() {
         // NOTICE: Retrieve version of the package from the composer file
-        $pathFile = getcwd().'/vendor/forestadmin/forest-laravel/composer.json';
+        $pathFile = join(DIRECTORY_SEPARATOR, [__DIR__, '..', 'composer.json']);
         $composerFileContent = file_get_contents($pathFile);
         $composerFileContent = json_decode($composerFileContent);
         return [
