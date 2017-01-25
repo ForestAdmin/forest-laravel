@@ -21,7 +21,7 @@
       "source": "https://github.com/ForestAdmin/forest-laravel"
   },
   "require": {
-    "guzzlehttp/guzzle": "^5",
+    "guzzlehttp/guzzle": "^6.2",
     "neomerx/json-api": "^0.8.10",
     "symfony/class-loader": "^3.1",
     "doctrine/orm": "^2.5",

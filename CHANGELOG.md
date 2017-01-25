@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 
-## RELEASE 0.0.9 - 2016-01-25
+## RELEASE 0.0.11 - 2016-01-25
+### Fixed
+- Package - Rollback constraint on guzzlehttp.
+
+## RELEASE 0.0.10 - 2016-01-25
 ### Fixed
 - Package - Reduce constraint on guzzlehttp.
 
