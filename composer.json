@@ -1,7 +1,7 @@
 {
   "name": "forestadmin/forest-laravel",
   "description": "Official Laravel Liana for Forest",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "library",
   "keywords": ["forest", "laravel", "admin", "panel", "interface"],
   "homepage": "http://www.forestadmin.com",
@@ -21,7 +21,7 @@
       "source": "https://github.com/ForestAdmin/forest-laravel"
   },
   "require": {
-    "guzzlehttp/guzzle": "^6.2",
+    "guzzlehttp/guzzle": "^5",
     "neomerx/json-api": "^0.8.10",
     "symfony/class-loader": "^3.1",
     "doctrine/orm": "^2.5",
