@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.12 - 2016-01-27
 ### Changed
 - Packages - Support GuzzleHttp 5+ and 6+.
 
