@@ -10,10 +10,6 @@
     {
       "name": "Arnaud Besnier",
       "email": "arnaudibesnier@gmail.com"
-    },
-    {
-      "name": "Ludovic Esmanne",
-      "email": "lesmanne@gmail.com"
     }
   ],
   "support": {
@@ -21,7 +17,7 @@
       "source": "https://github.com/ForestAdmin/forest-laravel"
   },
   "require": {
-    "guzzlehttp/guzzle": "^6.2",
+    "guzzlehttp/guzzle": "5 - 6",
     "neomerx/json-api": "^0.8.10",
     "symfony/class-loader": "^3.1",
     "doctrine/orm": "^2.5",

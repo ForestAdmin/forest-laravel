@@ -2,17 +2,16 @@
 
 namespace ForestAdmin\ForestLaravel;
 
-use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
-use Symfony\Component\ClassLoader\ClassMapGenerator;
 use ForestAdmin\ForestLaravel\Serializer\ApimapSerializer;
 use ForestAdmin\ForestLaravel\Model\Collection;
 use ForestAdmin\ForestLaravel\Model\Field;
 use ForestAdmin\ForestLaravel\Http\Services\SchemaUtils;
 use ForestAdmin\ForestLaravel\Http\Services\StringUtils;
+use ForestAdmin\ForestLaravel\Http\Utils\Client;
 
 class Bootstraper {
     protected $models = [];
@@ -35,7 +34,7 @@ class Bootstraper {
                     $isInstantiable = $reflectionClass->IsInstantiable();
 
                     if ($isModel && $isInstantiable) {
-                        // Instantiate the model
+                        // NOTICE: Instantiate the model
                         $model = App::make($name);
                         $className = explode('\\', $name);
                         $primaryKey = [$model->getKeyName()];
@@ -171,11 +170,7 @@ class Bootstraper {
         ];
 
         $client = new Client();
-        $response = $client->request(
-            'POST',
-            Config::get('forest.url').'/forest/apimaps',
-            $options
-        );
+        $response = $client->request('POST', '/apimaps', $options);
 
         return ($response->getStatusCode() == 204);
     }

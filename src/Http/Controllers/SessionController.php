@@ -3,7 +3,7 @@
 namespace ForestAdmin\ForestLaravel\Http\Controllers;
 
 // use App\Http\Controllers\Controller;
-use GuzzleHttp\Client;
+use ForestAdmin\ForestLaravel\Http\Utils\Client;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Config;
@@ -37,16 +37,14 @@ class SessionController extends Controller {
         $usersAllowed = [];
 
         $client = new Client();
-        $renderingId = $params->renderingId;
-        $url = Config::get('forest.url').'/forest/renderings/'.$renderingId.
-          '/allowed-users';
+        $path = '/renderings/'.$params->renderingId.'/allowed-users';
         $options = array(
             'headers' => array(
                 'Content-Type' => 'application/json',
                 'forest-secret-key' => Config::get('forest.secret_key')
             )
         );
-        $response = $client->request('GET', $url, $options);
+        $response = $client->request('GET', $path, $options);
         $response = json_decode($response->getBody());
 
         if ($response) {
