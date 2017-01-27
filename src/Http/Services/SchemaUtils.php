@@ -42,4 +42,18 @@ class SchemaUtils {
         $className = explode('\\', $className);
         return strtolower(end($className));
     }
+
+    public static function getRelationship($model, $method) {
+      $reflection = new \ReflectionMethod($model, $method);
+
+      if ($reflection->getNumberOfRequiredParameters() > 0) {
+          $params = [];
+          foreach ($reflection->getParameters() as $parameter) {
+              $params[] = '';
+          }
+        return call_user_func_array(array($model, $method), $params);
+      } else {
+        return $model->{$method}();
+      }
+    }
 }

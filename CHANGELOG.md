@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- Relationships - Support relationship methods having parameters.
 
 ## RELEASE 0.0.12 - 2016-01-27
 ### Changed

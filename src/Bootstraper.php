@@ -118,7 +118,7 @@ class Bootstraper {
                       'belongsTo', 'morphOne', 'morphTo', 'morphMany',
                       'morphToMany'])) {
                         $relation = $matches[1];
-                        $relationObj = $model->{$method}();
+                        $relationObj = SchemaUtils::getRelationship($model, $method);
                         if ($relationObj instanceof Relation) {
                             $relatedModel = '\\'.get_class($relationObj
                               ->getRelated());
