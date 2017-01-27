@@ -33,9 +33,9 @@ You will then follow a 4-step process:
 
   ```
   return [
-    'secret_key' => 'YOUR-SUPER-SECRET-SECRET-KEY',
-    'auth_key' => 'YOUR-SUPER-SECRET-AUTH-KEY',
-    'models_path' => 'app/models'
+    'secret_key' => 'YOUR-SUPER-SECRET-SECRET-KEY', // Insert the secret key provided by Forest
+    'auth_key' => 'YOUR-SUPER-SECRET-AUTH-KEY', // Choose a secret to secure your data access
+    'models_path' => 'app/models' // Specify the path of your Laravel models
   ];
   ```
 
