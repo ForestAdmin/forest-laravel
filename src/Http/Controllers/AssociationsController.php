@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use ForestAdmin\ForestLaravel\Http\Services\HasManyGetter;
+use ForestAdmin\ForestLaravel\Http\Services\SchemaUtils;
 use ForestAdmin\ForestLaravel\Serializer\ResourcesSerializer;
 
 class AssociationsController extends ApplicationController {
@@ -76,7 +77,8 @@ class AssociationsController extends ApplicationController {
 
         if ($this->modelResource) {
             $record = $this->modelResource->find($recordId);
-            if ($record->{$associationName}() instanceof HasMany) {
+            $relation = SchemaUtils::getRelationship($record, $associationName);
+            if ($relation instanceof HasMany) {
                 $recordsAssociated = array();
 
                 foreach($content as $value) {
@@ -84,11 +86,11 @@ class AssociationsController extends ApplicationController {
                                                 ->find($value['id']);
                 }
 
-                $record->{$associationName}()->saveMany($recordsAssociated);
+                $relation->saveMany($recordsAssociated);
             } else {
                 // NOTICE: Set BelongsToMany association
                 foreach($content as $value) {
-                    $record->{$associationName}()->attach($value['id']);
+                    $relation->attach($value['id']);
                 }
             }
         }
@@ -103,7 +105,8 @@ class AssociationsController extends ApplicationController {
 
         if ($this->modelResource) {
             $record = $this->modelResource->find($recordId);
-            if ($record->{$associationName}() instanceof HasMany) {
+            $relation = SchemaUtils::getRelationship($record, $associationName);
+            if ($relation instanceof HasMany) {
                 $foreignKey = $modelName.'_id';
                 foreach($content as $value) {
                     $recordDissociated = $this->modelAssociation->find($value['id']);
@@ -113,7 +116,7 @@ class AssociationsController extends ApplicationController {
             } else {
                 // NOTICE: Set BelongsToMany association
                 foreach($content as $value) {
-                    $record->{$associationName}()->detach($value['id']);
+                    $relation->detach($value['id']);
                 }
             }
         }

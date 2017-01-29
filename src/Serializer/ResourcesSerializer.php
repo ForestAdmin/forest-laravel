@@ -41,15 +41,17 @@ class ResourcesSerializer {
                         )
                     ));
                 }
-            } elseif ($field->isTypeToMany() && !$excludeHasMany) {
-                $resourceAssociated = new JsonApi\Resource($fieldName);
-                $resource->add_relation($fieldName, $resourceAssociated, true,
-                  array(
-                    'links' => array(
-                        'related' => '/forest/'.$type.'/'.$record->id.
-                          '/relationships/'.$fieldName
-                    )
-                ));
+            } elseif ($field->isTypeToMany()) {
+                if (!$excludeHasMany) {
+                    $resourceAssociated = new JsonApi\Resource($fieldName);
+                    $resource->add_relation($fieldName, $resourceAssociated, true,
+                      array(
+                        'links' => array(
+                            'related' => '/forest/'.$type.'/'.$record->id.
+                              '/relationships/'.$fieldName
+                        )
+                    ));
+                }
             } else {
                 if ($field->getType() == 'Date') {
                     if (gettype($record->{$fieldName}) === 'object') {

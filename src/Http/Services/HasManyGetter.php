@@ -28,8 +28,11 @@ class HasManyGetter {
         }
         $pageSize = $this->params->page['size'];
 
-        $query = $this->modelResource
-          ->find($this->params->recordId)->{$this->associationName}()
+        $relationObj = SchemaUtils::getRelationship(
+            $this->modelResource->find($this->params->recordId),
+            $this->associationName);
+
+        $query = $relationObj
           ->select($this->modelAssociation->getTable().'.*')
           ->skip(($pageNumber - 1) * $pageSize)
           ->take($pageSize);
@@ -39,10 +42,11 @@ class HasManyGetter {
 
         $this->records = $query->get();
 
-        $this->recordsCount = $this->modelResource
-          ->find($this->params->recordId)
-          ->{$this->associationName}()
-          ->count();
+        $query = SchemaUtils::getRelationship(
+            $this->modelResource->find($this->params->recordId),
+            $this->associationName);
+
+        $this->recordsCount = $query->count();
     }
 
     protected function getIncludes() {
@@ -75,20 +79,20 @@ class HasManyGetter {
     protected function addOrderBy($query) {
         if ($this->params->sort) {
             $order = 'ASC';
+            $sort = $this->params->sort;
 
             if (substr($this->params->sort, 0, 1) === '-') {
-                $this->params->sort = substr($this->params->sort, 1);
+                $sort = substr($sort, 1);
                 $order = 'DESC';
             }
 
-            if (strpos($this->params->sort, '.') === false) {
-                $this->params->sort =
-                  $this->modelAssociation->getTable().'.'.$this->params->sort;
+            if (strpos($sort, '.') === false) {
+                $sort = $this->modelAssociation->getTable().'.'.$sort;
             } else {
-                $sortExploded = explode('.', $this->params->sort);
-                $this->params->sort = implode('s.', $sortExploded);
+                $sortExploded = explode('.', $sort);
+                $sort = implode('s.', $sortExploded);
             }
-            $query->orderBy($this->params->sort, $order);
+            $query->orderBy($sort, $order);
         }
     }
 }

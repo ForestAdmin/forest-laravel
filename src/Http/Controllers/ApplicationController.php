@@ -28,16 +28,17 @@ class ApplicationController extends Controller {
 
     private function getModelAssociation($modelName, $associationName) {
         $model = SchemaUtils::findResource($modelName);
-        return $model->{$associationName}()->getRelated();
+        $relationObj = SchemaUtils::getRelationship($model, $associationName);
+        return $relationObj->getRelated();
     }
 
     private function getSchema($modelName, $associationName = null) {
         $name = $modelName;
 
         if ($associationName) {
-            $modelAssociation = $this->modelResource
-                                     ->{$associationName}()
-                                     ->getRelated();
+            $relationObj = SchemaUtils::getRelationship(
+              $this->modelResource, $associationName);
+            $modelAssociation = $relationObj->getRelated();
             $name = SchemaUtils::findResourceName($modelAssociation);
         }
 
