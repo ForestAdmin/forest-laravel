@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## RELEASE 0.0.13 - 2016-01-29
+### Fixed
+- Relationships - Support relationship methods having parameters.
+
 ## RELEASE 0.0.12 - 2016-01-27
 ### Changed
 - Packages - Support GuzzleHttp 5+ and 6+.
