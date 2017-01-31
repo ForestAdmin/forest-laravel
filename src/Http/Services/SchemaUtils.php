@@ -47,13 +47,14 @@ class SchemaUtils {
       $reflection = new \ReflectionMethod($model, $method);
 
       if ($reflection->getNumberOfRequiredParameters() > 0) {
-          $params = [];
-          foreach ($reflection->getParameters() as $parameter) {
-              $params[] = '';
-          }
-        return call_user_func_array(array($model, $method), $params);
+          // $params = [];
+          // foreach ($reflection->getParameters() as $parameter) {
+          //     $params[] = '';
+          // }
+          // return call_user_func_array(array($model, $method), $params);
+          return null;
       } else {
-        return $model->{$method}();
+          return $model->{$method}();
       }
     }
 }
