@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## RELEASE 0.0.14 - 2016-01-31
+### Changed
+- Relationships - Relationship methods having parameters are now ignored.
+
 ## RELEASE 0.0.13 - 2016-01-29
 ### Fixed
 - Relationships - Support relationship methods having parameters.
