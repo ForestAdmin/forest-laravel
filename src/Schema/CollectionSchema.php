@@ -28,4 +28,14 @@ class CollectionSchema extends SchemaProvider {
 
         return $attributes;
     }
+
+    public function getRelationships($collection, $isPrimary,
+      array $includeRelationships) {
+
+        return [
+            'actions' => [
+                'data' => $collection->getActions()
+            ]
+        ];
+    }
 }

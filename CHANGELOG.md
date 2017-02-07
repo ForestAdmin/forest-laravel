@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## RELEASE 0.0.16 - 2016-02-07
+### Added
+- Smart Action - Smart actions support.
+
 ## RELEASE 0.0.15 - 2016-02-07
 ### Fixed
 - Collections - Fix the collections names formatting.
