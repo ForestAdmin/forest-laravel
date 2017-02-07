@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- Collections - Fix the collections names formatting.
 
 ## RELEASE 0.0.14 - 2016-01-31
 ### Changed

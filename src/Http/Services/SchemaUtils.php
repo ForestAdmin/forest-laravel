@@ -25,7 +25,7 @@ class SchemaUtils {
             foreach ($modelClassNames as $modelClassName) {
                 if (class_exists($modelClassName)) {
                     $classNamePath = explode('\\', $modelClassName);
-                    if (strtolower(end($classNamePath)) == $modelName) {
+                    if (strtolower(end($classNamePath)) == strtolower($modelName)) {
                         return App::make($modelClassName);
                     }
                 }
