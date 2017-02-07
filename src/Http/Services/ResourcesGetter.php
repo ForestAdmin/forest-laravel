@@ -3,6 +3,7 @@
 namespace ForestAdmin\ForestLaravel\Http\Services;
 
 use ForestAdmin\ForestLaravel\Bootstraper;
+use ForestAdmin\ForestLaravel\Database;
 use ForestAdmin\ForestLaravel\Http\Services\ConditionSetter;
 
 class ResourcesGetter {
@@ -115,6 +116,7 @@ class ResourcesGetter {
     }
 
     protected function addSearch($query) {
+        $s = Database\Utils::separator();
         if ($this->params->search) {
             foreach($this->collectionSchema->getFields() as $field) {
                 if ($field->isAttribute()) {
@@ -126,8 +128,8 @@ class ResourcesGetter {
                         $query->orWhere($this->tableNameModel.'.'.
                           $field->getField(), intval($this->params->search));
                     } else if ($field->getType() === 'String') {
-                        $query->orWhereRaw('LOWER("'.$this->tableNameModel.'"."'.
-                          $field->getField().'") LIKE LOWER(\'%'.
+                        $query->orWhereRaw('LOWER('.$s.$this->tableNameModel.
+                          $s.'.'.$s.$field->getField().$s.') LIKE LOWER(\'%'.
                           $this->params->search.'%\')');
                     }
                 } else if ($field->isTypeToOne()) {
@@ -145,9 +147,9 @@ class ResourcesGetter {
                                   $fieldAssociation->getField(),
                                   intval($this->params->search));
                             } else if ($fieldAssociation->getType() === 'String') {
-                                $query->orWhereRaw('LOWER("'.$tableAssociation.'"."'.
-                                  $fieldAssociation->getField().'") LIKE LOWER(\'%'.
-                                  $this->params->search.'%\')');
+                                $query->orWhereRaw('LOWER('.$s.$tableAssociation.
+                                  $s.'.'.$s.$fieldAssociation->getField().$s.
+                                  ') LIKE LOWER(\'%'.$this->params->search.'%\')');
                             }
                         }
                     }

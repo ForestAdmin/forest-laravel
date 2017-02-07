@@ -48,7 +48,7 @@ class Bootstraper {
                           strtolower(end($className)));
 
                         $collection = new Collection(
-                            strtolower(end($className)),
+                            lcfirst(end($className)),
                             $reflectionClass->getName(),
                             $primaryKey,
                             $fields
