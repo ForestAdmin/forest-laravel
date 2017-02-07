@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.16 - 2016-02-07
 ### Added
 - Smart Action - Smart actions support.
 
