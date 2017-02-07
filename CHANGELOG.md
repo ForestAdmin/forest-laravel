@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.15 - 2016-02-07
 ### Fixed
 - Collections - Fix the collections names formatting.
 - Search - Fix the search on MySQL projects.
