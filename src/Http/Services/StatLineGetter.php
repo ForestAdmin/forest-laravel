@@ -3,7 +3,7 @@
 namespace ForestAdmin\ForestLaravel\Http\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Config;
+use ForestAdmin\ForestLaravel\Database;
 
 class StatLineGetter {
     protected $model;
@@ -65,7 +65,7 @@ class StatLineGetter {
     }
 
     protected function getGroupByDateInterval() {
-        if (Config::get('database.default') === 'mysql') {
+        if (Database\Utils::isMySql()) {
             $this->groupByDateField = '`'.$this->tableNameModel.'`.`'.
               $this->groupByDateField.'`';
             switch ($this->timeRange) {

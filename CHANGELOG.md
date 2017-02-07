@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Fixed
 - Collections - Fix the collections names formatting.
+- Search - Fix the search on MySQL projects.
 
 ## RELEASE 0.0.14 - 2016-01-31
 ### Changed
