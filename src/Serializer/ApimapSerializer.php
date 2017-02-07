@@ -2,10 +2,13 @@
 
 namespace ForestAdmin\ForestLaravel\Serializer;
 
+use ForestAdmin\ForestLaravel\Model\Action;
 use ForestAdmin\ForestLaravel\Model\Collection;
+use ForestAdmin\ForestLaravel\Schema\ActionSchema;
 use ForestAdmin\ForestLaravel\Schema\CollectionSchema;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 
 class ApimapSerializer {
     protected $collections;
@@ -27,14 +30,18 @@ class ApimapSerializer {
     }
 
     public function serialize() {
+        $params = new EncodingParameters(['actions']);
         $encoder = Encoder::instance(
-            array(Collection::class => CollectionSchema::class),
+            array(
+              Action::class => ActionSchema::class,
+              Collection::class => CollectionSchema::class
+            ),
             new EncoderOptions(JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
               '')
         );
         $apimap = $encoder
                 ->withMeta($this->meta)
-                ->encodeData($this->collections)
+                ->encodeData($this->collections, $params)
                 .PHP_EOL;
 
         return $apimap;

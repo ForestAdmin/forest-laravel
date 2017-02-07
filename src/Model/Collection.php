@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\ForestLaravel\Model;
 
+use Illuminate\Support\Facades\Config;
 use ForestAdmin\Liana\Exception\RelationshipNotFoundException;
 
 class Collection {
@@ -14,7 +15,7 @@ class Collection {
       $actions = null) {
         $this->setName($name);
         $this->setFields($fields);
-        $this->setActions($actions);
+        $this->setActions();
     }
 
     public function setName($name) {
@@ -25,8 +26,19 @@ class Collection {
         return $this->name;
     }
 
-    public function setActions($actions = null) {
-        $this->actions = is_null($actions) ? array() : $actions;
+    public function setActions() {
+        $this->actions = array();
+        $actions = Config::get('forest.actions');
+        $collectionName = ucfirst($this->getName());
+
+        if (!is_null($actions) && array_key_exists($collectionName, $actions)) {
+            $collectionActions = $actions[$collectionName];
+            if (!is_null($collectionActions)) {
+                foreach($collectionActions as $action) {
+                    $this->actions[] = new Action($this, $action);
+                }
+            }
+        }
     }
 
     public function getActions() {
