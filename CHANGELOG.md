@@ -1,6 +1,7 @@
 # Change Log
 
 ## [Unreleased]
+## RELEASE 0.0.17 - 2016-02-24
 ### Fixed
 - Laravel 5.4.+ - Support Laravel version 5.4.+.
 
