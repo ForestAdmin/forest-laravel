@@ -14,8 +14,14 @@ class ForestServiceProvider extends ServiceProvider {
         // NOTICE: Register Forest routes
         $namespace = $this->app->getNamespace();
 
-        $this->app->router->middleware('auth.forest',
-          AuthenticateForestUser::class);
+        if (method_exists($this->app->router, 'aliasMiddleware')) {
+          // NOTICE: Support Laravel version greater than 5.4
+          $this->app->router->aliasMiddleware('auth.forest',
+            AuthenticateForestUser::class);
+        } else {
+          $this->app->router->middleware('auth.forest',
+            AuthenticateForestUser::class);
+        }
         $this->app->router->group([
           'namespace' => $namespace.'Http\Controllers'], function() {
             require __DIR__. '/Http/routes.php';
