@@ -58,8 +58,15 @@ class ResourcesController extends ApplicationController {
 
         if ($this->modelResource) {
             $record = $this->modelResource->find($recordId);
-            return ResourcesSerializer::returnJsonRecord(
-              $this->modelResource, $this->schemaResource, $modelName, $record);
+
+            if ($record) {
+                return ResourcesSerializer::returnJsonRecord(
+                  $this->modelResource, $this->schemaResource, $modelName,
+                  $record);
+            } else {
+                return Response::make(
+                  'The '.$modelName.' #'.$recordId.' does not exist.', 404);
+            }
         } else {
             return Response::make('Collection not found', 404);
         }
