@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- Record Getter - Prevent an unexpected error if the record does not exist.
+
 ## RELEASE 0.0.17 - 2016-02-24
 ### Fixed
 - Laravel 5.4.+ - Support Laravel version 5.4.+.
