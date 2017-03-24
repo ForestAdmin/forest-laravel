@@ -82,18 +82,23 @@ class StatValueGetter {
 
     protected function addJoins($query) {
         foreach($this->getIncludes() as $i => $field) {
-            $foreignKey = $this->model->{$field->getField()}()->getForeignKey();
             $tableNameAssociation = SchemaUtils::findResource(
               $field->getReferencedModelName())->getTable();
+            $modelField = $this->model->{$field->getField()}();
 
             if ($field->getInverseOf()) {
                 // NOTICE: HasOne Relationship
-                $foreignKeyExploded = explode('.', $foreignKey);
-                $foreignKey = end($foreignKeyExploded);
+                if (method_exists($modelField, 'getForeignKeyName')) {
+                    $foreignKey = $modelField->getForeignKeyName();
+                } else {
+                    // NOTICE: Support Laravel versions before 5.4
+                    $foreignKey = $modelField->getForeignKey();
+                }
                 $query->leftJoin($tableNameAssociation.' AS t'.$i,
                   $this->tableNameModel.'.id', '=', 't'.$i.'.'.$foreignKey);
             } else {
                 // NOTICE: BelongsTo relationship
+                $foreignKey = $modelField->getForeignKey();
                 $query->leftJoin($tableNameAssociation.' AS t'.$i,
                   $this->tableNameModel.'.'.$foreignKey, '=', 't'.$i.'.id');
             }
