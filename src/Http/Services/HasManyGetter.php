@@ -60,15 +60,21 @@ class HasManyGetter {
               ->{$fieldName}()
               ->getRelated()
               ->getTable();
+            $modelField = $this->modelAssociation->{$fieldName}();
 
-            $foreignKey = $this->modelAssociation->{$fieldName}()
-              ->getForeignKey();
             if ($field->getInverseOf()) {
                 // NOTICE: HasOne Relationship
+                if (method_exists($modelField, 'getForeignKeyName')) {
+                    $foreignKey = $modelField->getForeignKeyName();
+                } else {
+                    // NOTICE: Support Laravel versions before 5.4
+                    $foreignKey = $modelField->getForeignKey();
+                }
                 $query->leftJoin($tableNameInclude,
                   $this->modelAssociation->getTable().'.id', '=', $foreignKey);
             } else {
                 // NOTICE: BelongsTo relationship
+                $foreignKey = $modelField->getForeignKey();
                 $query->leftJoin($tableNameInclude.' AS t'.$i,
                   $this->modelAssociation->getTable().'.'.$foreignKey, '=',
                   't'.$i.'.id');
