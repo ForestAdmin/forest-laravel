@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.18 - 2016-03-24
 ### Fixed
 - Record Getter - Prevent an unexpected error if the record does not exist.
 - Records Getter - Fix records retrieval for resources having a hasOne relationship.
