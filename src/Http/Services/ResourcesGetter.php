@@ -27,8 +27,8 @@ class ResourcesGetter {
     }
 
     public function perform() {
-        $pageNumber = $this->params->page['number'];
-        $pageSize = $this->params->page['size'];
+        $pageNumber = $this->params->page['number'] ?: 1;
+        $pageSize = $this->params->page['size'] ?: 10;
 
         $query = $this->model->select($this->tableNameModel.'.*')
                              ->skip(($pageNumber - 1) * $pageSize)
