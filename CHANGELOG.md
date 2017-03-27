@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.20 - 2016-03-27
 ### Fixed
 - Records Search - Prevent an internal error if a hasOne relationship model is not found during a search.
 
