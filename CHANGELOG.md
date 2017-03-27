@@ -1,6 +1,11 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.20 - 2016-03-27
+### Fixed
+- Records Search - Prevent an internal error if a hasOne relationship model is not found during a search.
+
 ## RELEASE 0.0.19 - 2016-03-26
 ### Fixed
 - Records Search - Fix records search on MySql while adding an existing record in a hasMany relationship.
