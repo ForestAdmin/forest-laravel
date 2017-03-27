@@ -144,19 +144,29 @@ class ResourcesGetter {
                       $field->getReferencedModelName())->getTable();
                     $tableAssociation = $this->fieldTableNames[$field->getField()];
 
-                    foreach($modelAssociation->getFields() as $fieldAssociation) {
-                        if ($fieldAssociation->isAttribute()) {
-                            if ($fieldAssociation->getType() === 'Number' &&
-                              intval($this->params->search) !== 0) {
-                                $query->orWhere($tableAssociation.'.'.
-                                  $fieldAssociation->getField(),
-                                  intval($this->params->search));
-                            } else if ($fieldAssociation->getType() === 'String') {
-                                $query->orWhereRaw('LOWER('.$s.$tableAssociation.
-                                  $s.'.'.$s.$fieldAssociation->getField().$s.
-                                  ') LIKE LOWER(\'%'.$this->params->search.'%\')');
-                            }
-                        }
+                    // NOTICE: Prevent errors on search if the modelAssociation
+                    //         is not found.
+                    // TODO: Make the search feature evolve with 2 kinds of
+                    //       search: simple search and a deep search.
+                    if ($modelAssociation) {
+                      foreach($modelAssociation->getFields() as
+                        $fieldAssociation) {
+                          if ($fieldAssociation->isAttribute()) {
+                              if ($fieldAssociation->getType() === 'Number' &&
+                                intval($this->params->search) !== 0) {
+                                  $query->orWhere($tableAssociation.'.'.
+                                    $fieldAssociation->getField(),
+                                    intval($this->params->search));
+                              } else if ($fieldAssociation->getType() ===
+                                'String') {
+                                  $query->orWhereRaw('LOWER('.$s.
+                                    $tableAssociation.$s.'.'.$s.
+                                    $fieldAssociation->getField().$s.
+                                    ') LIKE LOWER(\'%'.$this->params->search.
+                                    '%\')');
+                              }
+                          }
+                      }
                     }
                 }
             }
