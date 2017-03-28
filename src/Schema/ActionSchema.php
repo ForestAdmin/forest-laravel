@@ -18,6 +18,7 @@ class ActionSchema extends SchemaProvider {
         $attributes['http-method'] = $action->getHttpMethod();
         $attributes['redirect'] = $action->getRedirect();
         $attributes['download'] = $action->getDownload();
+        $attributes['global'] = $action->getGlobal();
 
         return $attributes;
     }

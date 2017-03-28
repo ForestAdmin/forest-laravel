@@ -10,6 +10,7 @@ class Action {
     protected $endpoint;
     protected $redirect;
     protected $download;
+    protected $global;
 
     public function __construct($collection, $action) {
         $this->setCollection($collection);
@@ -28,6 +29,10 @@ class Action {
 
         if (array_key_exists('redirect', $action)) {
             $this->setRedirect($action['redirect']);
+        }
+
+        if (array_key_exists('global', $action)) {
+            $this->setGlobal($action['global']);
         }
 
         if (array_key_exists('download', $action)) {
@@ -59,6 +64,10 @@ class Action {
         $this->download = $download;
     }
 
+    public function setGlobal($global) {
+        $this->global = $global;
+    }
+
     public function getCollection() {
         return $this->collection;
     }
@@ -81,5 +90,9 @@ class Action {
 
     public function getDownload() {
         return $this->download;
+    }
+
+    public function getGlobal() {
+        return $this->global;
     }
 }
