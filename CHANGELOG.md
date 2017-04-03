@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Smart Actions - Users don't have to select records to use a smart action through the global option.
+- Version Warning - Display a warning message if the liana version used is too old.
 
 ## RELEASE 0.0.20 - 2016-03-27
 ### Fixed
