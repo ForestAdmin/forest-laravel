@@ -5,6 +5,7 @@ namespace ForestAdmin\ForestLaravel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use ForestAdmin\ForestLaravel\Serializer\ApimapSerializer;
 use ForestAdmin\ForestLaravel\Model\Collection;
@@ -172,7 +173,16 @@ class Bootstraper {
         $client = new Client();
         $response = $client->request('POST', '/apimaps', $options);
 
-        return ($response->getStatusCode() == 204);
+        $body = json_decode($response->getBody(), true);
+        $message = $body['warning'];
+
+        if ($message) {
+          // TODO: Create a dedicated logger to improve the logging experience.
+          Log::warning($message);
+        }
+
+        $httpStatusCodesValid = array(200, 202, 204);
+        return (in_array($response->getStatusCode(), $httpStatusCodesValid));
     }
 
     protected function createApimap() {
