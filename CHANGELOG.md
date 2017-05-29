@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Filters - Add the not contains operator.
 
 ## RELEASE 0.0.21 - 2016-04-06
 ### Added
