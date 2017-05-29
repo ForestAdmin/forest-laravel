@@ -11,38 +11,37 @@ class ConditionSetter {
         $operatorDateIntervalGetter = new OperatorDateIntervalGetter($query,
           $typeWhere, $field, $value, $previous);
 
-        if (substr($value, 0, 1) === '!' && substr($value, 1, 2) !== '*') {
-            $query->{$typeWhere}($field, '!=', substr($value, 1));
+        $last = strlen($value) - 1;
+        if ($value[0] === '!' && $value[1] !== '*') {
+          $query->{$typeWhere}($field, '!=', substr($value, 1));
         } else if (substr($value, 0, 1) === '>') {
-            if ($operatorDateIntervalGetter->isIntervalDateValue()) {
-                $operatorDateIntervalGetter->getIntervalDateFilter();
-            } else {
-                $query->{$typeWhere}($field, '>', substr($value, 1));
-            }
+          if ($operatorDateIntervalGetter->isIntervalDateValue()) {
+              $operatorDateIntervalGetter->getIntervalDateFilter();
+          } else {
+              $query->{$typeWhere}($field, '>', substr($value, 1));
+          }
         } else if (substr($value, 0, 1) === '<') {
-            if ($operatorDateIntervalGetter->isIntervalDateValue()) {
-                $operatorDateIntervalGetter->getIntervalDateFilter();
-            } else {
-                $query->{$typeWhere}($field, '<', substr($value, 1));
-            }
-        } else if (substr($value, 0, 1) === '!' &&
-          substr($value, 1, 2) === '*' && substr($value, -1) === '*') {
-          echo '----------------------------------------';
+          if ($operatorDateIntervalGetter->isIntervalDateValue()) {
+            $operatorDateIntervalGetter->getIntervalDateFilter();
+          } else {
+            $query->{$typeWhere}($field, '<', substr($value, 1));
+          }
+        } else if ($value[0] === '!' && $value[1] === '*' && substr($value, -1) === '*') {
           $query->{$typeWhere}($field, 'NOT LIKE', '%'.substr($value, 2, -1).'%');
         } else if (substr($value, 0, 1) === '*' && substr($value, -1) === '*') {
-            $query->{$typeWhere}($field, 'LIKE', '%'.substr($value, 1, -1).'%');
+          $query->{$typeWhere}($field, 'LIKE', '%'.substr($value, 1, -1).'%');
         } else if (substr($value, 0, 1) === '*') {
-            $query->{$typeWhere}($field, 'LIKE', '%'.substr($value, 1));
+          $query->{$typeWhere}($field, 'LIKE', '%'.substr($value, 1));
         } else if (substr($value, -1) === '*') {
-            $query->{$typeWhere}($field, 'LIKE', substr($value, 0, -1).'%');
+          $query->{$typeWhere}($field, 'LIKE', substr($value, 0, -1).'%');
         } else if ($value === '$present') {
-            $query->{$typeWhere}($field, '!=', null);
+          $query->{$typeWhere}($field, '!=', null);
         } else if ($value === '$blank') {
-            $query->{$typeWhere}($field, '=', null);
+          $query->{$typeWhere}($field, '=', null);
         } else if ($operatorDateIntervalGetter->isIntervalDateValue()) {
-            $operatorDateIntervalGetter->getIntervalDateFilter();
+          $operatorDateIntervalGetter->getIntervalDateFilter();
         } else {
-            $query->{$typeWhere}($field, '=', $value);
+          $query->{$typeWhere}($field, '=', $value);
         }
     }
 }
