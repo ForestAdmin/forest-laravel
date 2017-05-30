@@ -11,7 +11,7 @@ class ConditionSetter {
         $operatorDateIntervalGetter = new OperatorDateIntervalGetter($query,
           $typeWhere, $field, $value, $previous);
 
-        if (substr($value, 0, 1) === '!') {
+        if (substr($value, 0, 1) === '!' && substr($value, 1, 1) !== '*') {
             $query->{$typeWhere}($field, '!=', substr($value, 1));
         } else if (substr($value, 0, 1) === '>') {
             if ($operatorDateIntervalGetter->isIntervalDateValue()) {
@@ -25,6 +25,9 @@ class ConditionSetter {
             } else {
                 $query->{$typeWhere}($field, '<', substr($value, 1));
             }
+        } else if ($value[0] === '!' && $value[1] === '*' &&
+          substr($value, -1) === '*') {
+            $query->{$typeWhere}($field, 'NOT LIKE', '%'.substr($value, 2, -1).'%');
         } else if (substr($value, 0, 1) === '*' && substr($value, -1) === '*') {
             $query->{$typeWhere}($field, 'LIKE', '%'.substr($value, 1, -1).'%');
         } else if (substr($value, 0, 1) === '*') {
