@@ -2,17 +2,21 @@
 
 ## [Unreleased]
 
+## RELEASE 1.1.4 - 2017-05-30
+### Added
+- Filters - Add the not contains operator.
+
 ## RELEASE 0.0.21 - 2016-04-06
-### Added
+### Added
 - Smart Actions - Users don't have to select records to use a smart action through the global option.
 - Version Warning - Display a warning message if the liana version used is too old.
 
 ## RELEASE 0.0.20 - 2016-03-27
-### Fixed
+### Fixed
 - Records Search - Prevent an internal error if a hasOne relationship model is not found during a search.
 
 ## RELEASE 0.0.19 - 2016-03-26
-### Fixed
+### Fixed
 - Records Search - Fix records search on MySql while adding an existing record in a hasMany relationship.
 
 ## RELEASE 0.0.18 - 2016-03-24
@@ -21,7 +25,7 @@
 - Records Getter - Fix records retrieval for resources having a hasOne relationship.
 
 ## RELEASE 0.0.17 - 2016-02-24
-### Fixed
+### Fixed
 - Laravel 5.4.+ - Support Laravel version 5.4.+.
 
 ## RELEASE 0.0.16 - 2016-02-07
@@ -29,28 +33,28 @@
 - Smart Action - Smart actions support.
 
 ## RELEASE 0.0.15 - 2016-02-07
-### Fixed
+### Fixed
 - Collections - Fix the collections names formatting.
 - Search - Fix the search on MySQL projects.
 
 ## RELEASE 0.0.14 - 2016-01-31
-### Changed
+### Changed
 - Relationships - Relationship methods having parameters are now ignored.
 
 ## RELEASE 0.0.13 - 2016-01-29
-### Fixed
+### Fixed
 - Relationships - Support relationship methods having parameters.
 
 ## RELEASE 0.0.12 - 2016-01-27
-### Changed
+### Changed
 - Packages - Support GuzzleHttp 5+ and 6+.
 
 ## RELEASE 0.0.11 - 2016-01-25
-### Fixed
+### Fixed
 - Packages - Rollback constraint on GuzzleHttp.
 
 ## RELEASE 0.0.10 - 2016-01-25
-### Fixed
+### Fixed
 - Packages - Reduce constraint on GuzzleHttp.
 
 ## RELEASE 0.0.9 - 2016-12-04
