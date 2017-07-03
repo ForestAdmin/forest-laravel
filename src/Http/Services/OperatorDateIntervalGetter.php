@@ -39,6 +39,7 @@ class OperatorDateIntervalGetter {
     protected $periodsToday = '$today';
     protected $periodsPreviousXDays= '/^\$previous(\d+)Days$/';
     protected $periodsXDaysToDate = '/^\$(\d+)DaysToDate$/';
+    protected $periodsXHoursBefore = '/^\$(\d+)HoursBefore$/';
 
     public function __construct($query, $typeWhere, $field, $value,
       $previous=false) {
@@ -65,6 +66,10 @@ class OperatorDateIntervalGetter {
         }
 
         if (preg_match($this->periodsXDaysToDate, $this->value, $matches)) {
+            return true;
+        }
+
+        if (preg_match($this->periodsXHoursBefore, $this->value, $matches)) {
             return true;
         }
 
@@ -133,6 +138,14 @@ class OperatorDateIntervalGetter {
                 $query->where($this->field, '>=', Carbon::now()
                          ->subDays($this->matches[1][0] - 1)->startOfDay())
                       ->where($this->field, '<=', Carbon::now());
+            });
+        }
+
+        if (preg_match($this->periodsXHoursBefore, $this->value,
+          $this->matches)) {
+            return $this->query->{$this->typeWhere}(function ($query) {
+                $query->where($this->field, '<', Carbon::now()
+                         ->subDays($this->matches[1][0]));
             });
         }
 
