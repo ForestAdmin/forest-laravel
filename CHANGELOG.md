@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Filters - Add the before x hours operator.
 
 ## RELEASE 1.1.4 - 2017-05-30
 ### Added
