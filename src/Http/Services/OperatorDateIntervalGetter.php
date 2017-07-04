@@ -2,7 +2,6 @@
 
 namespace ForestAdmin\ForestLaravel\Http\Services;
 
-use Log;
 use Carbon\Carbon;
 
 class OperatorDateIntervalGetter {
@@ -144,8 +143,6 @@ class OperatorDateIntervalGetter {
 
         if (preg_match($this->periodsXHoursBefore, $this->value,
           $this->matches)) {
-            Log::info('This is some useful information.');
-            Log::info(Carbon::now()->subDays($this->matches[1][0]));
             return $this->query->{$this->typeWhere}(function ($query) {
               $query->where($this->field, '<', Carbon::now()
                      ->subHours($this->matches[1][0]));
