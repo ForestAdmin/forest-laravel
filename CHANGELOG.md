@@ -1,10 +1,12 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.0.23 - 2017-07-05
 ### Added
 - Filters - Add the before x hours operator.
 
-## RELEASE 1.1.4 - 2017-05-30
+## RELEASE 0.0.22 - 2017-05-30
 ### Added
 - Filters - Add the not contains operator.
 
