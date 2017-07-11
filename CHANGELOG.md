@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Search - Users can search on the hasMany associated data of a specific record.
 
 ## RELEASE 0.0.23 - 2017-07-05
 ### Added
