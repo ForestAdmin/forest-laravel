@@ -33,7 +33,6 @@ class SearchBuilder {
                         $this->query->orWhere($this->tableNameModel.'.'.
                           $field->getField(), intval($this->params->search));
                     } else if ($field->getType() === 'String') {
-                        // Log::info($query);
                         $this->query->orWhereRaw('LOWER('.$s.
                           $this->tableNameModel.$s.'.'.$s.$field->getField().
                           $s.') LIKE LOWER(\'%'.$this->params->search.'%\')');
