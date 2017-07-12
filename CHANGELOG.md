@@ -1,7 +1,7 @@
 # Change Log
 
 ## [Unreleased]
-## RELEASE 0.0.25 - 2017-07-12
+## RELEASE 0.0.26 - 2017-07-12
 ### Added
 - Debug Mode - Add debug logs for the apimap creation.
 - Onboarding - Add specific error logs for bad configurations.
