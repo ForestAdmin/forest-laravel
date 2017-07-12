@@ -29,7 +29,6 @@ class Bootstraper {
             if (class_exists($name)) {
                 try {
                     $reflectionClass = new \ReflectionClass($name);
-
                     $isModel = $reflectionClass->isSubclassOf(
                                 'Illuminate\Database\Eloquent\Model');
                     $isInstantiable = $reflectionClass->IsInstantiable();
@@ -37,7 +36,6 @@ class Bootstraper {
                     if ($isModel && $isInstantiable) {
                         // NOTICE: Instantiate the model
                         $model = App::make($name);
-                        $modelName = $model->getTable();
                         $primaryKey = [$model->getKeyName()];
                         $fields = [];
 
@@ -46,10 +44,10 @@ class Bootstraper {
                         }
 
                         $fields = $this->updateFieldsFromMethods($model,
-                          $fields, $modelName);
+                          $fields);
 
                         $collection = new Collection(
-                            $modelName,
+                            $model->getTable(),
                             $reflectionClass->getName(),
                             $primaryKey,
                             $fields
@@ -92,7 +90,7 @@ class Bootstraper {
         return $fields;
     }
 
-    protected function updateFieldsFromMethods($model, $fields, $modelName) {
+    protected function updateFieldsFromMethods($model, $fields) {
         $methods = get_class_methods($model);
         if ($methods) {
             foreach ($methods as $method) {
@@ -122,12 +120,7 @@ class Bootstraper {
                         $relation = $matches[1];
                         $relationObj = SchemaUtils::getRelationship($model, $method);
                         if ($relationObj instanceof Relation) {
-                            $relatedModel = '\\'.get_class($relationObj
-                              ->getRelated());
-                            $entityClassNameExploded = explode('\\',
-                              get_class($relationObj->getRelated()));
-                            $nameClass = strtolower(
-                              end($entityClassNameExploded));
+                            $nameClass = $relationObj->getRelated()->getTable();
 
                             if (in_array($relation, ['belongsToMany',
                               'hasMany'])) {
@@ -135,7 +128,7 @@ class Bootstraper {
                                   $nameClass.".id");
                             } elseif ($relation == 'hasOne') {
                                 $fields[] = new Field($method, "Number",
-                                  $nameClass.".id", $modelName);
+                                  $nameClass.".id", $model->getTable());
                             } elseif ($relation == 'belongsTo') {
                                 $fields[] = new Field($method, "Number",
                                   $nameClass.".id");

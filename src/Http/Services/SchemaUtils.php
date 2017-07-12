@@ -27,11 +27,18 @@ class SchemaUtils {
             $modelClassNames = self::fetchModels();
             foreach ($modelClassNames as $modelClassName) {
                 if (class_exists($modelClassName)) {
-                    $model = App::make($modelClassName);
-                    $modelName = $model->getTable();
+                    $reflectionClass = new \ReflectionClass($modelClassName);
+                    $isModel = $reflectionClass->isSubclassOf(
+                                'Illuminate\Database\Eloquent\Model');
+                    $isInstantiable = $reflectionClass->IsInstantiable();
 
-                    if ($modelName == $modelNameToFind) {
-                        return $model;
+                    if ($isModel && $isInstantiable) {
+                        $model = App::make($modelClassName);
+                        $modelName = $model->getTable();
+
+                        if ($modelName == $modelNameToFind) {
+                            return $model;
+                        }
                     }
                 }
             }
@@ -43,9 +50,7 @@ class SchemaUtils {
     }
 
     public static function findResourceName($model) {
-        $className = get_class($model);
-        $className = explode('\\', $className);
-        return strtolower(end($className));
+        return $model->getTable();
     }
 
     public static function getRelationship($model, $method) {
