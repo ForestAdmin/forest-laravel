@@ -22,9 +22,9 @@ class ApimapSerializer {
     }
 
     protected function setApimap($collections) {
-        foreach ($collections as $className => $collection) {
+        foreach ($collections as $index => $collection) {
             $collection->convertForApimap();
-            $collections[$className] = $collection;
+            $collections[$index] = $collection;
         }
         $this->collections = $collections;
     }
