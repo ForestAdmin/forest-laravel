@@ -4,6 +4,9 @@
 ### Added
 - Onboarding - Add specific error logs for bad configurations.
 
+### Changed
+- Apimap - Generate the models names based on the database table names instead of the class names.
+
 ## RELEASE 0.0.24 - 2017-07-11
 ### Added
 - Search - Users can search on the hasMany associated data of a specific record.

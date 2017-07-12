@@ -37,7 +37,7 @@ class Bootstraper {
                     if ($isModel && $isInstantiable) {
                         // NOTICE: Instantiate the model
                         $model = App::make($name);
-                        $className = explode('\\', $name);
+                        $modelName = $model->getTable();
                         $primaryKey = [$model->getKeyName()];
                         $fields = [];
 
@@ -45,11 +45,11 @@ class Bootstraper {
                             $fields = $this->getFieldsFromTable($model);
                         }
 
-                        $fields = $this->updateFieldsFromMethods($model, $fields,
-                          strtolower(end($className)));
+                        $fields = $this->updateFieldsFromMethods($model,
+                          $fields, $modelName);
 
                         $collection = new Collection(
-                            lcfirst(end($className)),
+                            $modelName,
                             $reflectionClass->getName(),
                             $primaryKey,
                             $fields
@@ -57,8 +57,9 @@ class Bootstraper {
 
                         $this->collections[] = $collection;
                     }
-                } catch (\Exception $e) {
-                    var_dump($e->getFile().$e->getLine().': '.$e->getMessage());
+                } catch (\Exception $exception) {
+                    var_dump($exception->getFile().$exception->getLine().
+                      ': '.$exception->getMessage());
                 }
             }
         }

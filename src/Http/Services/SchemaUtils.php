@@ -22,14 +22,16 @@ class SchemaUtils {
         return $models;
     }
 
-    public static function findResource($modelName) {
+    public static function findResource($modelNameToFind) {
         try {
             $modelClassNames = self::fetchModels();
             foreach ($modelClassNames as $modelClassName) {
                 if (class_exists($modelClassName)) {
-                    $classNamePath = explode('\\', $modelClassName);
-                    if (strtolower(end($classNamePath)) == strtolower($modelName)) {
-                        return App::make($modelClassName);
+                    $model = App::make($modelClassName);
+                    $modelName = $model->getTable();
+
+                    if ($modelName == $modelNameToFind) {
+                        return $model;
                     }
                 }
             }
