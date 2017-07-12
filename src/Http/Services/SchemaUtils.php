@@ -5,16 +5,19 @@ namespace ForestAdmin\ForestLaravel\Http\Services;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\ClassLoader\ClassMapGenerator;
+use ForestAdmin\ForestLaravel\Logger;
 
 class SchemaUtils {
     public static function fetchModels() {
         $models = [];
-        $dir = base_path().'/'.Config::get('forest.models_path');
+        $directory = base_path().'/'.Config::get('forest.models_path');
 
-        if (file_exists($dir)) {
-            foreach(ClassMapGenerator::createMap($dir) as $model => $path) {
+        if (file_exists($directory)) {
+            foreach(ClassMapGenerator::createMap($directory) as $model => $path) {
                 $models[] = $model;
             }
+        } else {
+            Logger::error('Cannot find the models directory: '.$directory);
         }
         return $models;
     }

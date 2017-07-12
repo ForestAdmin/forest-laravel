@@ -5,8 +5,8 @@ namespace ForestAdmin\ForestLaravel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use ForestAdmin\ForestLaravel\Logger;
 use ForestAdmin\ForestLaravel\Serializer\ApimapSerializer;
 use ForestAdmin\ForestLaravel\Model\Collection;
 use ForestAdmin\ForestLaravel\Model\Field;
@@ -178,7 +178,7 @@ class Bootstraper {
 
         if ($message) {
           // TODO: Create a dedicated logger to improve the logging experience.
-          Log::warning($message);
+          Logger::warning($message);
         }
 
         $httpStatusCodesValid = array(200, 202, 204);
@@ -187,7 +187,7 @@ class Bootstraper {
 
     protected function createApimap() {
         $serializer = new ApimapSerializer($this->getCollections(),
-                        $this->getApimapMeta());
+          $this->getApimapMeta());
         return $serializer->serialize();
     }
 
