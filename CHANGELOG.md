@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- Debug Mode - Add debug logs for the apimap creation.
 - Onboarding - Add specific error logs for bad configurations.
 
 ### Changed

@@ -22,10 +22,13 @@ class Bootstraper {
         // QUESTION: Doctrine is installed in the package, so why do we check
         //           the Doctrine presence?
         $hasDoctrine = interface_exists('Doctrine\DBAL\Driver');
-
         $this->models = SchemaUtils::fetchModels();
 
+        Logger::debug('[Apimap] => '.sizeof($this->models).
+          ' potential models detected.');
+
         foreach ($this->models as $name) {
+            Logger::debug('[Apimap]   => start '.$name.' class inspection.');
             if (class_exists($name)) {
                 try {
                     $reflectionClass = new \ReflectionClass($name);
@@ -34,6 +37,9 @@ class Bootstraper {
                     $isInstantiable = $reflectionClass->IsInstantiable();
 
                     if ($isModel && $isInstantiable) {
+                        Logger::debug('[Apimap]     => '.$name.
+                          ' model detected.');
+
                         // NOTICE: Instantiate the model
                         $model = App::make($name);
                         $primaryKey = [$model->getKeyName()];
@@ -52,6 +58,8 @@ class Bootstraper {
                             $primaryKey,
                             $fields
                         );
+                        Logger::debug('[Apimap]     => Collection '.
+                          $model->getTable().' created.');
 
                         $this->collections[] = $collection;
                     }
@@ -62,6 +70,8 @@ class Bootstraper {
             }
         }
 
+        Logger::debug('[Apimap] => '.sizeof($this->collections).
+          ' collections created in the apimap.');
         return $this->collections;
     }
 
@@ -152,6 +162,7 @@ class Bootstraper {
 
     public function sendApimap() {
         $apimap = $this->createApimap();
+        Logger::debug('[Apimap] => Generated Apimap: '.$apimap);
 
         // NOTICE: Removed PHP_EOL at the end of the files
         $apimap = str_replace(PHP_EOL, '', $apimap);
