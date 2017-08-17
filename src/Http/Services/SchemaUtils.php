@@ -5,28 +5,40 @@ namespace ForestAdmin\ForestLaravel\Http\Services;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\ClassLoader\ClassMapGenerator;
+use ForestAdmin\ForestLaravel\Logger;
 
 class SchemaUtils {
     public static function fetchModels() {
         $models = [];
-        $dir = base_path().'/'.Config::get('forest.models_path');
+        $directory = base_path().'/'.Config::get('forest.models_path');
 
-        if (file_exists($dir)) {
-            foreach(ClassMapGenerator::createMap($dir) as $model => $path) {
+        if (file_exists($directory)) {
+            foreach(ClassMapGenerator::createMap($directory) as $model => $path) {
                 $models[] = $model;
             }
+        } else {
+            Logger::error('Cannot find the models directory: '.$directory);
         }
         return $models;
     }
 
-    public static function findResource($modelName) {
+    public static function findResource($modelNameToFind) {
         try {
             $modelClassNames = self::fetchModels();
             foreach ($modelClassNames as $modelClassName) {
                 if (class_exists($modelClassName)) {
-                    $classNamePath = explode('\\', $modelClassName);
-                    if (strtolower(end($classNamePath)) == strtolower($modelName)) {
-                        return App::make($modelClassName);
+                    $reflectionClass = new \ReflectionClass($modelClassName);
+                    $isModel = $reflectionClass->isSubclassOf(
+                                'Illuminate\Database\Eloquent\Model');
+                    $isInstantiable = $reflectionClass->IsInstantiable();
+
+                    if ($isModel && $isInstantiable) {
+                        $model = App::make($modelClassName);
+                        $modelName = $model->getTable();
+
+                        if ($modelName == $modelNameToFind) {
+                            return $model;
+                        }
                     }
                 }
             }
@@ -38,9 +50,7 @@ class SchemaUtils {
     }
 
     public static function findResourceName($model) {
-        $className = get_class($model);
-        $className = explode('\\', $className);
-        return strtolower(end($className));
+        return $model->getTable();
     }
 
     public static function getRelationship($model, $method) {

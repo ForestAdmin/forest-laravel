@@ -4,7 +4,23 @@
 ### Added
 - Auto-Discovery - Auto-register the service provider on Laravel 5.5+
 
-## RELEASE 1.1.4 - 2017-05-30
+## RELEASE 0.0.26 - 2017-07-12
+### Added
+- Debug Mode - Add debug logs for the apimap creation.
+- Onboarding - Add specific error logs for bad configurations.
+
+### Changed
+- Apimap - Generate the models names based on the database table names instead of the class names.
+
+## RELEASE 0.0.24 - 2017-07-11
+### Added
+- Search - Users can search on the hasMany associated data of a specific record.
+
+## RELEASE 0.0.23 - 2017-07-05
+### Added
+- Filters - Add the before x hours operator.
+
+## RELEASE 0.0.22 - 2017-05-30
 ### Added
 - Filters - Add the not contains operator.
 

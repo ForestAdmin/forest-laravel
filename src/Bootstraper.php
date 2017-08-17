@@ -5,8 +5,8 @@ namespace ForestAdmin\ForestLaravel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use ForestAdmin\ForestLaravel\Logger;
 use ForestAdmin\ForestLaravel\Serializer\ApimapSerializer;
 use ForestAdmin\ForestLaravel\Model\Collection;
 use ForestAdmin\ForestLaravel\Model\Field;
@@ -22,22 +22,26 @@ class Bootstraper {
         // QUESTION: Doctrine is installed in the package, so why do we check
         //           the Doctrine presence?
         $hasDoctrine = interface_exists('Doctrine\DBAL\Driver');
-
         $this->models = SchemaUtils::fetchModels();
 
+        Logger::debug('[Apimap] => '.sizeof($this->models).
+          ' potential models detected.');
+
         foreach ($this->models as $name) {
+            Logger::debug('[Apimap]   => start '.$name.' class inspection.');
             if (class_exists($name)) {
                 try {
                     $reflectionClass = new \ReflectionClass($name);
-
                     $isModel = $reflectionClass->isSubclassOf(
                                 'Illuminate\Database\Eloquent\Model');
                     $isInstantiable = $reflectionClass->IsInstantiable();
 
                     if ($isModel && $isInstantiable) {
+                        Logger::debug('[Apimap]     => '.$name.
+                          ' model detected.');
+
                         // NOTICE: Instantiate the model
                         $model = App::make($name);
-                        $className = explode('\\', $name);
                         $primaryKey = [$model->getKeyName()];
                         $fields = [];
 
@@ -45,24 +49,29 @@ class Bootstraper {
                             $fields = $this->getFieldsFromTable($model);
                         }
 
-                        $fields = $this->updateFieldsFromMethods($model, $fields,
-                          strtolower(end($className)));
+                        $fields = $this->updateFieldsFromMethods($model,
+                          $fields);
 
                         $collection = new Collection(
-                            lcfirst(end($className)),
+                            $model->getTable(),
                             $reflectionClass->getName(),
                             $primaryKey,
                             $fields
                         );
+                        Logger::debug('[Apimap]     => Collection '.
+                          $model->getTable().' created.');
 
                         $this->collections[] = $collection;
                     }
-                } catch (\Exception $e) {
-                    var_dump($e->getFile().$e->getLine().': '.$e->getMessage());
+                } catch (\Exception $exception) {
+                    var_dump($exception->getFile().$exception->getLine().
+                      ': '.$exception->getMessage());
                 }
             }
         }
 
+        Logger::debug('[Apimap] => '.sizeof($this->collections).
+          ' collections created in the apimap.');
         return $this->collections;
     }
 
@@ -91,7 +100,7 @@ class Bootstraper {
         return $fields;
     }
 
-    protected function updateFieldsFromMethods($model, $fields, $modelName) {
+    protected function updateFieldsFromMethods($model, $fields) {
         $methods = get_class_methods($model);
         if ($methods) {
             foreach ($methods as $method) {
@@ -121,12 +130,7 @@ class Bootstraper {
                         $relation = $matches[1];
                         $relationObj = SchemaUtils::getRelationship($model, $method);
                         if ($relationObj instanceof Relation) {
-                            $relatedModel = '\\'.get_class($relationObj
-                              ->getRelated());
-                            $entityClassNameExploded = explode('\\',
-                              get_class($relationObj->getRelated()));
-                            $nameClass = strtolower(
-                              end($entityClassNameExploded));
+                            $nameClass = $relationObj->getRelated()->getTable();
 
                             if (in_array($relation, ['belongsToMany',
                               'hasMany'])) {
@@ -134,7 +138,7 @@ class Bootstraper {
                                   $nameClass.".id");
                             } elseif ($relation == 'hasOne') {
                                 $fields[] = new Field($method, "Number",
-                                  $nameClass.".id", $modelName);
+                                  $nameClass.".id", $model->getTable());
                             } elseif ($relation == 'belongsTo') {
                                 $fields[] = new Field($method, "Number",
                                   $nameClass.".id");
@@ -158,6 +162,7 @@ class Bootstraper {
 
     public function sendApimap() {
         $apimap = $this->createApimap();
+        Logger::debug('[Apimap] => Generated Apimap: '.$apimap);
 
         // NOTICE: Removed PHP_EOL at the end of the files
         $apimap = str_replace(PHP_EOL, '', $apimap);
@@ -178,7 +183,7 @@ class Bootstraper {
 
         if ($message) {
           // TODO: Create a dedicated logger to improve the logging experience.
-          Log::warning($message);
+          Logger::warning($message);
         }
 
         $httpStatusCodesValid = array(200, 202, 204);
@@ -187,7 +192,7 @@ class Bootstraper {
 
     protected function createApimap() {
         $serializer = new ApimapSerializer($this->getCollections(),
-                        $this->getApimapMeta());
+          $this->getApimapMeta());
         return $serializer->serialize();
     }
 

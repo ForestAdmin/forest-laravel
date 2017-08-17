@@ -2,11 +2,14 @@
 
 namespace ForestAdmin\ForestLaravel\Http\Services;
 
+use ForestAdmin\ForestLaravel\Http\Services\SearchBuilder;
+
 class HasManyGetter {
     protected $modelResource;
     protected $associationName;
     protected $modelAssociation;
     protected $schemaAssociation;
+    protected $fieldTableNames;
     protected $params;
     public $records;
     public $recordsCount;
@@ -40,6 +43,13 @@ class HasManyGetter {
         $this->addJoins($query);
         $this->addOrderBy($query);
 
+        $query->where(function($query) {
+          $searchBuilder = new SearchBuilder($query, $this->schemaAssociation,
+            $this->modelAssociation->getTable(), $this->fieldTableNames,
+            $this->params);
+          $searchBuilder->perform();
+        });
+
         $this->records = $query->get();
 
         $query = SchemaUtils::getRelationship(
@@ -70,8 +80,9 @@ class HasManyGetter {
                     // NOTICE: Support Laravel versions before 5.4
                     $foreignKey = $modelField->getForeignKey();
                 }
-                $query->leftJoin($tableNameInclude,
-                  $this->modelAssociation->getTable().'.id', '=', $foreignKey);
+                $query->leftJoin($tableNameInclude.' AS t'.$i,
+                  $this->modelAssociation->getTable().'.id', '=',
+                  't'.$i.'.'.$foreignKey);
             } else {
                 // NOTICE: BelongsTo relationship
                 $foreignKey = $modelField->getForeignKey();
@@ -79,6 +90,8 @@ class HasManyGetter {
                   $this->modelAssociation->getTable().'.'.$foreignKey, '=',
                   't'.$i.'.id');
             }
+
+            $this->fieldTableNames[$field->getField()] = 't'.$i;
         }
     }
 
