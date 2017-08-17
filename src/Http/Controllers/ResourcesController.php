@@ -41,78 +41,36 @@ class ResourcesController extends ApplicationController {
             $headers = [
                 'Content-type' => 'text/csv; charset=utf-8',
                 'Content-Disposition' => 'attachment; filename='.$filename,
-                'Last-Modified' => Carbon::now(),
+                'Last-Modified' => Carbon::now()->timestamp,
                 'X-Accel-Buffering' => 'no',
                 'Cache-Control' => 'no-cache'
             ];
 
-            // $stream = 'toto';
-            // return response()->stream(function() use ($stream) {
-            //     $i = 0;
-            //     while ($i < 10) {
-            //         Logger::warning($i);
-            //         $i = $i + 1;
-            //         $i.', '.$i;
-            //         // sleep(1);
-            //     }
-            //     // $stream->start();
-            // });
+            $response = new StreamedResponse(function () use ($request,
+              $modelName) {
+                $CSVHeader = explode(',', $request->header);
 
-            $response = new StreamedResponse(function () {
                 $handle = fopen('php://output', 'w');
+                fputcsv($handle, $CSVHeader);
 
-                fputcsv($handle, [
-                    'id',
-                    // 'name',
-                    'email'
-                ]);
-
-                // fclose($handle);
-
-                // foreach ($this->modelResource->all() as $user) {
-                //     // Add a new row with data
-                //     fputcsv($handle, [
-                //         $user->id,
-                //         // $user->name,
-                //         $user->email
-                //     ]);
-                // }
-                $i = 0;
-                while ($i < 10) {
-                    // $handle = fopen('php://output', 'w');
-                    // sendStat();
-                    for ($a = 0; $a < 1000; $a++) {
-                        fputcsv($handle, [
-                            $i,
-                            // $user->name,
-                            $i.$a
-                        ]);
+                $getter = new ResourcesGetter($modelName, $this->modelResource,
+                  $this->schemaResource, $request);
+                $getter->getQueryForBatch()->chunk(1000, function ($records) use
+                  ($handle) {
+                    foreach ($records as $record) {
+                      // TODO: Set the right values now.
+                      fputcsv($handle, [
+                          $record->id,
+                          '',
+                          $record->id
+                      ]);
                     }
+                });
 
-                    Logger::warning($i);
-                    $i = $i + 1;
-                    // fclose($handle);
-                    sleep(1);
-                }
-
-                // Close the output stream
-                // fclose($handle);
+                fclose($handle);
             }, 200, $headers);
 
             return $response;
-
-
-
-
-
-            // $getter = new ResourcesGetter($modelName, $this->modelResource,
-            //   $this->schemaResource, $request);
-            // $getter->perform();
-            // $json = ResourcesSerializer::returnJsonRecords($this->modelResource,
-            //   $this->schemaResource, $modelName, $getter->records,
-            //   $getter->recordsCount);
-            // return Response::make($json, 200);
-            // return Response::stream(, 200, $headers);
         } else {
             return Response::make('Collection not found', 404);
         }
