@@ -9,6 +9,7 @@ Route::group(['prefix' => 'forest', 'middleware' => 'cors'], function () {
         $namespace = '\ForestAdmin\ForestLaravel\Http\Controllers';
 
         // Records
+        Route::get('{modelName}.csv', $namespace.'\ResourcesController@csvExport');
         Route::get('{modelName}', $namespace.'\ResourcesController@index');
         Route::post('{modelName}', $namespace.'\ResourcesController@create');
         Route::get('{modelName}/{recordId}', $namespace.'\ResourcesController@show');

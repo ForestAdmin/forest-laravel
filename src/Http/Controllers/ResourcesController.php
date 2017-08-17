@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ForestAdmin\ForestLaravel\Http\Services\ResourcesGetter;
 use ForestAdmin\ForestLaravel\Serializer\ResourcesSerializer;
+use ForestAdmin\ForestLaravel\Logger;
+
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResourcesController extends ApplicationController {
 
@@ -25,6 +28,91 @@ class ResourcesController extends ApplicationController {
               $this->schemaResource, $modelName, $getter->records,
               $getter->recordsCount);
             return Response::make($json, 200);
+        } else {
+            return Response::make('Collection not found', 404);
+        }
+    }
+
+    public function csvExport(Request $request, $modelName) {
+        $this->findModelsAndSchemas($modelName);
+
+        if ($this->modelResource) {
+            $filename = $request->filename.'.csv';
+            $headers = [
+                'Content-type' => 'text/csv; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename='.$filename,
+                'Last-Modified' => Carbon::now(),
+                'X-Accel-Buffering' => 'no',
+                'Cache-Control' => 'no-cache'
+            ];
+
+            // $stream = 'toto';
+            // return response()->stream(function() use ($stream) {
+            //     $i = 0;
+            //     while ($i < 10) {
+            //         Logger::warning($i);
+            //         $i = $i + 1;
+            //         $i.', '.$i;
+            //         // sleep(1);
+            //     }
+            //     // $stream->start();
+            // });
+
+            $response = new StreamedResponse(function () {
+                $handle = fopen('php://output', 'w');
+
+                fputcsv($handle, [
+                    'id',
+                    // 'name',
+                    'email'
+                ]);
+
+                // fclose($handle);
+
+                // foreach ($this->modelResource->all() as $user) {
+                //     // Add a new row with data
+                //     fputcsv($handle, [
+                //         $user->id,
+                //         // $user->name,
+                //         $user->email
+                //     ]);
+                // }
+                $i = 0;
+                while ($i < 10) {
+                    // $handle = fopen('php://output', 'w');
+                    // sendStat();
+                    for ($a = 0; $a < 1000; $a++) {
+                        fputcsv($handle, [
+                            $i,
+                            // $user->name,
+                            $i.$a
+                        ]);
+                    }
+
+                    Logger::warning($i);
+                    $i = $i + 1;
+                    // fclose($handle);
+                    sleep(1);
+                }
+
+                // Close the output stream
+                // fclose($handle);
+            }, 200, $headers);
+
+            return $response;
+
+
+
+
+
+            // $getter = new ResourcesGetter($modelName, $this->modelResource,
+            //   $this->schemaResource, $request);
+            // $getter->perform();
+            // $json = ResourcesSerializer::returnJsonRecords($this->modelResource,
+            //   $this->schemaResource, $modelName, $getter->records,
+            //   $getter->recordsCount);
+            // return Response::make($json, 200);
+            // return Response::stream(, 200, $headers);
         } else {
             return Response::make('Collection not found', 404);
         }
