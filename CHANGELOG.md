@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- Auto-Discovery - Auto-register the service provider on Laravel 5.5+
+- Installation - Auto-register the service provider on Laravel 5.5+.
 
 ## RELEASE 0.0.26 - 2017-07-12
 ### Added
