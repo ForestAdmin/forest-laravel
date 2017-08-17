@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Auto-Discovery - Auto-register the service provider on Laravel 5.5+
 
 ## RELEASE 1.1.4 - 2017-05-30
 ### Added
