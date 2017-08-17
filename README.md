@@ -16,7 +16,7 @@ You will then follow a 4-step process:
   ```bash
   composer require forestadmin/forest-laravel
   ```
-  Next, add the service provider to `config/app.php`
+  Next, if you're using Laravel 5.4 or below, add the service provider to `config/app.php`
 
   ```
   ForestAdmin\ForestLaravel\ForestServiceProvider::class,
