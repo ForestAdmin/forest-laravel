@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Installation - Auto-register the service provider on Laravel 5.5+.
+- Search - Add a params to include or not associations on search.
 
 ## RELEASE 0.0.26 - 2017-07-12
 ### Added

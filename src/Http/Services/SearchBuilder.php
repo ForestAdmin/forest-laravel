@@ -37,7 +37,7 @@ class SearchBuilder {
                           $this->tableNameModel.$s.'.'.$s.$field->getField().
                           $s.') LIKE LOWER(\'%'.$this->params->search.'%\')');
                     }
-                } else if ($field->isTypeToOne()) {
+                } else if ($field->isTypeToOne() && (int)$this->params->deep) {
                     $modelAssociation = $this->getCollectionSchema(
                       $field->getReferencedModelName());
                     $tableNameAssociation = SchemaUtils::findResource(
