@@ -52,7 +52,6 @@ class ResourcesGetter {
       $query = $this->model->select($this->tableNameModel.'.*');
 
       $this->addJoins($query);
-      // $this->addOrderBy($query);
       $query->where(function($query) { $this->addSearch($query); });
       $query->where(function($query) { $this->addFilters($query); });
 

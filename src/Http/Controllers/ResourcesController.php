@@ -9,10 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use ForestAdmin\ForestLaravel\Http\Services\ResourcesGetter;
 use ForestAdmin\ForestLaravel\Serializer\ResourcesSerializer;
-
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResourcesController extends ApplicationController {
 
