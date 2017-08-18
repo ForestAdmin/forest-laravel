@@ -6,6 +6,7 @@ use ForestAdmin\ForestLaravel\Http\Services\SearchBuilder;
 
 class HasManyGetter {
     protected $modelResource;
+    protected $relationObject;
     protected $associationName;
     protected $modelAssociation;
     protected $schemaAssociation;
@@ -21,6 +22,10 @@ class HasManyGetter {
         $this->modelAssociation = $modelAssociation;
         $this->schemaAssociation = $schemaAssociation;
         $this->params = $params;
+
+        $this->relationObject = SchemaUtils::getRelationship(
+            $this->modelResource->find($this->params->recordId),
+            $this->associationName);
     }
 
     public function perform() {
@@ -31,11 +36,7 @@ class HasManyGetter {
         }
         $pageSize = $this->params->page['size'];
 
-        $relationObj = SchemaUtils::getRelationship(
-            $this->modelResource->find($this->params->recordId),
-            $this->associationName);
-
-        $query = $relationObj
+        $query = $this->relationObject
           ->select($this->modelAssociation->getTable().'.*')
           ->skip(($pageNumber - 1) * $pageSize)
           ->take($pageSize);
@@ -57,6 +58,22 @@ class HasManyGetter {
             $this->associationName);
 
         $this->recordsCount = $query->count();
+    }
+
+    public function getQueryForBatch() {
+        $query = $this->relationObject
+          ->select($this->modelAssociation->getTable().'.*');
+
+        $this->addJoins($query);
+
+        $query->where(function($query) {
+          $searchBuilder = new SearchBuilder($query, $this->schemaAssociation,
+            $this->modelAssociation->getTable(), $this->fieldTableNames,
+            $this->params);
+          $searchBuilder->perform();
+        });
+
+        return $query;
     }
 
     protected function getIncludes() {

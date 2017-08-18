@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use ForestAdmin\ForestLaravel\Http\Services\ResourcesGetter;
 use ForestAdmin\ForestLaravel\Serializer\ResourcesSerializer;
 
@@ -31,59 +30,14 @@ class ResourcesController extends ApplicationController {
         }
     }
 
-    public function csvExport(Request $request, $modelName) {
+    public function exportCSV(Request $request, $modelName) {
         $this->findModelsAndSchemas($modelName);
 
         if ($this->modelResource) {
-            $filename = $request->filename.'.csv';
-            $headers = [
-                'Content-type' => 'text/csv; charset=utf-8',
-                'Content-Disposition' => 'attachment; filename='.$filename,
-                'Last-Modified' => Carbon::now()->timestamp,
-                'X-Accel-Buffering' => 'no',
-                'Cache-Control' => 'no-cache'
-            ];
-
-            $response = new StreamedResponse(function () use ($request,
-              $modelName) {
-                $CSVHeader = explode(',', $request->header);
-
-                foreach ($request->request as $key => $value) {
-                    if ($key == 'fields') {
-                        $fields = $value;
-                        $fieldNamesRequested = explode(',',
-                          $fields[$modelName]);
-                    }
-                }
-
-                $handle = fopen('php://output', 'w');
-                fputcsv($handle, $CSVHeader);
-
-                $getter = new ResourcesGetter($modelName, $this->modelResource,
-                  $this->schemaResource, $request);
-                $getter->getQueryForBatch()->chunk(1000, function ($records) use
-                  ($handle, $modelName, $fields, $fieldNamesRequested) {
-                    foreach ($records as $record) {
-                        $values = array_map(function ($fieldName) use
-                          ($record, $fields) {
-                            if (array_key_exists($fieldName, $fields)) {
-                                return $record->{$fieldName}
-                                  ->{$fields[$fieldName]};
-                            } else if ($record->{$fieldName}) {
-                                return $record->{$fieldName};
-                            } else {
-                                return '';
-                            }
-                          }, $fieldNamesRequested);
-
-                        fputcsv($handle, $values);
-                    }
-                });
-
-                fclose($handle);
-            }, 200, $headers);
-
-            return $response;
+            $getter = new ResourcesGetter($modelName, $this->modelResource,
+              $this->schemaResource, $request);
+            $batchQuery = $getter->getQueryForBatch();
+            return $this->streamResponseCSV($request, $modelName, $batchQuery);
         } else {
             return Response::make('Collection not found', 404);
         }

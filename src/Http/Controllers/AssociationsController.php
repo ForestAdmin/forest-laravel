@@ -30,6 +30,22 @@ class AssociationsController extends ApplicationController {
         }
     }
 
+    public function exportCSV($modelName, $recordId, $associationName,
+      Request $request) {
+        $this->findModelsAndSchemas($modelName, $associationName);
+
+        if ($this->modelResource && $this->modelAssociation) {
+            $getter = new HasManyGetter($this->modelResource,
+              $this->modelAssociation, $this->schemaAssociation,
+              $associationName, $request);
+            $batchQuery = $getter->getQueryForBatch();
+            return $this->streamResponseCSV($request, $associationName,
+              $batchQuery);
+        } else {
+            return Response::make('Collections not found', 404);
+        }
+    }
+
     public function update($modelName, $recordId, $associationName,
       Request $request) {
         $this->findModelsAndSchemas($modelName, $associationName);

@@ -2,10 +2,11 @@
 
 namespace ForestAdmin\ForestLaravel\Http\Controllers;
 
-// use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use ForestAdmin\ForestLaravel\Bootstraper;
 use ForestAdmin\ForestLaravel\Http\Services\SchemaUtils;
 use Illuminate\Routing\Controller;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApplicationController extends Controller {
 
@@ -24,6 +25,55 @@ class ApplicationController extends Controller {
             $this->schemaAssociation = $this->getSchema($modelName,
               $associationName);
         }
+    }
+
+    protected function streamResponseCSV($request, $modelName, $batchQuery) {
+        $filename = $request->filename.'.csv';
+        $headers = [
+            'Content-type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename='.$filename,
+            'Last-Modified' => Carbon::now()->timestamp,
+            'X-Accel-Buffering' => 'no',
+            'Cache-Control' => 'no-cache'
+        ];
+
+        $response = new StreamedResponse(function () use ($request,
+          $modelName, $batchQuery) {
+            $CSVHeader = explode(',', $request->header);
+
+            foreach ($request->request as $key => $value) {
+                if ($key == 'fields') {
+                    $fields = $value;
+                    $fieldNamesRequested = explode(',', $fields[$modelName]);
+                }
+            }
+
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, $CSVHeader);
+
+            $batchQuery->chunk(1000, function ($records) use
+              ($handle, $modelName, $fields, $fieldNamesRequested) {
+                foreach ($records as $record) {
+                    $values = array_map(function ($fieldName) use
+                      ($record, $fields) {
+                        if (array_key_exists($fieldName, $fields)) {
+                            return $record->{$fieldName}
+                              ->{$fields[$fieldName]};
+                        } else if ($record->{$fieldName}) {
+                            return $record->{$fieldName};
+                        } else {
+                            return '';
+                        }
+                      }, $fieldNamesRequested);
+
+                    fputcsv($handle, $values);
+                }
+            });
+
+            fclose($handle);
+        }, 200, $headers);
+
+        return $response;
     }
 
     private function getModelAssociation($modelName, $associationName) {
