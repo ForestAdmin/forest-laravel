@@ -25,8 +25,6 @@ class ResourcesGetter {
         $this->params = $params;
     }
 
-
-
     public function perform() {
         $pageNumber = $this->params->page['number'] ?: 1;
         $pageSize = $this->params->page['size'] ?: 10;
@@ -60,7 +58,6 @@ class ResourcesGetter {
 
       return $query;
     }
-
 
     protected function getIncludes() {
         return $this->collectionSchema->getFieldNamesToOne();

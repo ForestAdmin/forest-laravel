@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ForestAdmin\ForestLaravel\Http\Services\ResourcesGetter;
 use ForestAdmin\ForestLaravel\Serializer\ResourcesSerializer;
-use ForestAdmin\ForestLaravel\Logger;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -50,20 +49,35 @@ class ResourcesController extends ApplicationController {
               $modelName) {
                 $CSVHeader = explode(',', $request->header);
 
+                foreach ($request->request as $key => $value) {
+                    if ($key == 'fields') {
+                        $fields = $value;
+                        $fieldNamesRequested = explode(',',
+                          $fields[$modelName]);
+                    }
+                }
+
                 $handle = fopen('php://output', 'w');
                 fputcsv($handle, $CSVHeader);
 
                 $getter = new ResourcesGetter($modelName, $this->modelResource,
                   $this->schemaResource, $request);
                 $getter->getQueryForBatch()->chunk(1000, function ($records) use
-                  ($handle) {
+                  ($handle, $modelName, $fields, $fieldNamesRequested) {
                     foreach ($records as $record) {
-                      // TODO: Set the right values now.
-                      fputcsv($handle, [
-                          $record->id,
-                          '',
-                          $record->id
-                      ]);
+                        $values = array_map(function ($fieldName) use
+                          ($record, $fields) {
+                            if (array_key_exists($fieldName, $fields)) {
+                                return $record->{$fieldName}
+                                  ->{$fields[$fieldName]};
+                            } else if ($record->{$fieldName}) {
+                                return $record->{$fieldName};
+                            } else {
+                                return '';
+                            }
+                          }, $fieldNamesRequested);
+
+                        fputcsv($handle, $values);
                     }
                 });
 
