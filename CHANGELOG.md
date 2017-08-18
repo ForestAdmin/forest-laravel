@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Installation - Auto-register the service provider on Laravel 5.5+.
+- Exports - Forest can now handle large data exports.
 
 ## RELEASE 0.0.26 - 2017-07-12
 ### Added

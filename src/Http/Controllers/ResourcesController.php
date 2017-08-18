@@ -30,6 +30,19 @@ class ResourcesController extends ApplicationController {
         }
     }
 
+    public function exportCSV(Request $request, $modelName) {
+        $this->findModelsAndSchemas($modelName);
+
+        if ($this->modelResource) {
+            $getter = new ResourcesGetter($modelName, $this->modelResource,
+              $this->schemaResource, $request);
+            $batchQuery = $getter->getQueryForBatch();
+            return $this->streamResponseCSV($request, $modelName, $batchQuery);
+        } else {
+            return Response::make('Collection not found', 404);
+        }
+    }
+
     public function create($modelName, Request $request) {
         $this->findModelsAndSchemas($modelName);
 
