@@ -37,7 +37,8 @@ class SearchBuilder {
                           $this->tableNameModel.$s.'.'.$s.$field->getField().
                           $s.') LIKE LOWER(\'%'.$this->params->search.'%\')');
                     }
-                } else if ($field->isTypeToOne()) {
+                } else if ($field->isTypeToOne() &&
+                  (int)$this->params->searchExtended) {
                     $modelAssociation = $this->getCollectionSchema(
                       $field->getReferencedModelName());
                     $tableNameAssociation = SchemaUtils::findResource(
@@ -46,8 +47,6 @@ class SearchBuilder {
 
                     // NOTICE: Prevent errors on search if the modelAssociation
                     //         is not found.
-                    // TODO: Make the search feature evolve with 2 kinds of
-                    //       search: simple search and a deep search.
                     if ($modelAssociation) {
                       foreach($modelAssociation->getFields() as
                         $fieldAssociation) {
