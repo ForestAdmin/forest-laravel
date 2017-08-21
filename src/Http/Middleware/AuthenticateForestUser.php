@@ -9,10 +9,16 @@ use Psecio\Jwt\Jwt;
 
 class AuthenticateForestUser {
     public function handle($request, Closure $next) {
-        $authorization = $request->header('Authorization');
-        if ($authorization) {
-            $authorization = explode(' ', $authorization);
-            $token = $authorization[1];
+        $authorizationHeader = $request->header('Authorization');
+        $authorizationCookie = $request->cookie('liana_auth:session');
+
+        if ($authorizationHeader || $authorizationCookie) {
+            if ($authorizationHeader) {
+              $authorizationHeader = explode(' ', $authorizationHeader);
+              $token = $authorizationHeader[1];
+            } else {
+              $token = json_decode($authorizationCookie)->token;
+            }
 
             if ($token) {
                 $jwtHeader = new JwtHeader(Config::get('forest.auth_key'));

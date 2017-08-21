@@ -48,6 +48,16 @@ class ResourcesGetter {
         $this->recordsCount = $queryCount->count();
     }
 
+    public function getQueryForBatch() {
+      $query = $this->model->select($this->tableNameModel.'.*');
+
+      $this->addJoins($query);
+      $query->where(function($query) { $this->addSearch($query); });
+      $query->where(function($query) { $this->addFilters($query); });
+
+      return $query;
+    }
+
     protected function getIncludes() {
         return $this->collectionSchema->getFieldNamesToOne();
     }
