@@ -1,6 +1,7 @@
 # Change Log
 
 ## [Unreleased]
+## RELEASE 0.1.0 - 2017-08-21
 ### Added
 - Installation - Auto-register the service provider on Laravel 5.5+.
 - Search - Split "simple" and "deep" search features with a new param.
