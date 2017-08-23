@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- Exports - Fix bad initial implementation for exports authentication.
+
 ## RELEASE 0.1.0 - 2017-08-21
 ### Added
 - Installation - Auto-register the service provider on Laravel 5.5+.
