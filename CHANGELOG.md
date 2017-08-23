@@ -1,6 +1,7 @@
 # Change Log
 
 ## [Unreleased]
+## RELEASE 0.1.1 - 2017-08-23
 ### Fixed
 - Exports - Fix bad initial implementation for exports authentication.
 
