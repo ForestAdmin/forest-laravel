@@ -81,8 +81,15 @@ class ResourcesGetter {
             } else {
                 // NOTICE: BelongsTo relationship
                 $foreignKey = $modelField->getForeignKey();
+
+                try {
+                    $parentKey = $modelField->getOtherKey();
+                } catch (\Exception $exception) {
+                    $parentKey = 'id';
+                }
+
                 $query->leftJoin($tableNameAssociation.' AS t'.$i,
-                  $this->tableNameModel.'.'.$foreignKey, '=', 't'.$i.'.id');
+                  $this->tableNameModel.'.'.$foreignKey, '=', 't'.$i.'.'.$parentKey);
             }
 
             $this->fieldTableNames[$field->getField()] = 't'.$i;
