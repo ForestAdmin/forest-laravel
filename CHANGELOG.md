@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- BelongsTo - Fix "belongsTo" associations having a parent primary key different than "id".
+
 ## RELEASE 0.1.2 - 2017-09-10
 ### Changed
 - Laravel - Support Laravel 5.5.
