@@ -87,7 +87,7 @@ class ApplicationController extends Controller {
 
         if ($associationName) {
             $relationObj = SchemaUtils::getRelationship($this->modelResource, $associationName);
-            $name = SchemaUtils::classNameToForestCollectionName(get_class($relationObj->getRelated()));
+            $name = SchemaUtils::associationToCollectionName($relationObj);
         }
 
         $collections = (new Bootstraper())->getCollections();

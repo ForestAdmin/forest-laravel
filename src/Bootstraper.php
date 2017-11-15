@@ -52,7 +52,7 @@ class Bootstraper {
                         $fields = $this->updateFieldsFromMethods($model,
                           $fields);
 
-                        $collectionName = SchemaUtils::classNameToForestCollectionName($name);
+                        $collectionName = SchemaUtils::classNameToCollectionName($name);
 
                         $collection = new Collection(
                             $collectionName,
@@ -132,8 +132,7 @@ class Bootstraper {
                         $relation = $matches[1];
                         $relationObj = SchemaUtils::getRelationship($model, $method);
                         if ($relationObj instanceof Relation) {
-                            $nameCollection = SchemaUtils::classNameToForestCollectionName(
-                              get_class($relationObj->getRelated()));
+                            $nameCollection = SchemaUtils::associationToCollectionName($relationObj);
 
                             if (in_array($relation, ['belongsToMany',
                               'hasMany'])) {

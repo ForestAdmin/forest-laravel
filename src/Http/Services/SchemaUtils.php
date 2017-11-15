@@ -34,7 +34,7 @@ class SchemaUtils {
 
                     if ($isModel && $isInstantiable) {
                         $model = App::make($modelClassName);
-                        $collectionName = self::classNameToForestCollectionName($modelClassName);
+                        $collectionName = self::classNameToCollectionName($modelClassName);
 
                         if ($collectionName == $modelNameToFind) {
                             return $model;
@@ -49,12 +49,12 @@ class SchemaUtils {
         }
     }
 
-    public static function classNameToForestCollectionName($className) {
+    public static function classNameToCollectionName($className) {
         return str_replace('\\', '', $className);
     }
 
-    public static function findResourceName($model) {
-        return $model;
+    public static function associationToCollectionName($association) {
+        return self::classNameToCollectionName(get_class($association->getRelated()));
     }
 
     public static function getRelationship($model, $method) {
