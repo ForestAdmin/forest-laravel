@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Fixed
 - BelongsTo - Fix "belongsTo" associations having a parent primary key different than "id".
+- Collections - Fix collection access for models having an unconventional table name.
+- Record Destroy - Prevent a potential issue on record deletion.
 
 ## RELEASE 0.1.2 - 2017-09-10
 ### Changed

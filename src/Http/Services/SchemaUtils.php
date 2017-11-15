@@ -34,9 +34,9 @@ class SchemaUtils {
 
                     if ($isModel && $isInstantiable) {
                         $model = App::make($modelClassName);
-                        $modelName = $model->getTable();
+                        $collectionName = self::classNameToCollectionName($modelClassName);
 
-                        if ($modelName == $modelNameToFind) {
+                        if ($collectionName == $modelNameToFind) {
                             return $model;
                         }
                     }
@@ -49,8 +49,12 @@ class SchemaUtils {
         }
     }
 
-    public static function findResourceName($model) {
-        return $model->getTable();
+    public static function classNameToCollectionName($className) {
+        return str_replace('\\', '', $className);
+    }
+
+    public static function associationToCollectionName($association) {
+        return self::classNameToCollectionName(get_class($association->getRelated()));
     }
 
     public static function getRelationship($model, $method) {

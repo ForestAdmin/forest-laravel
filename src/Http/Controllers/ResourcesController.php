@@ -116,13 +116,10 @@ class ResourcesController extends ApplicationController {
             try {
                 $record = $this->modelResource->findOrFail($recordId);
                 $record->delete();
-                Response::make('Success', 204);
+                return Response::make('Success', 204);
             } catch(ModelNotFoundException $exception) {
                 return Response::make('Object not found for this recordId', 404);
             }
-            // TODO: Do not serialize the deleted record
-            return ResourcesSerializer::returnJsonRecord(
-              $this->schemaResource, $modelName, $record);
         } else {
             return Response::make('Collection not found', 404);
         }

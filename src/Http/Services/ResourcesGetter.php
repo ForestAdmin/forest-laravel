@@ -129,6 +129,7 @@ class ResourcesGetter {
             if (strpos($this->params->sort, '.') === false) {
                 $this->params->sort = $this->tableNameModel.'.'.$this->params->sort;
             } else {
+                // TODO: Fix the sorting on a relationship in some cases.
                 $sortExploded = explode('.', $this->params->sort);
                 $this->params->sort = implode('s.', $sortExploded);
             }

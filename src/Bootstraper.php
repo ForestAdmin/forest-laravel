@@ -52,14 +52,16 @@ class Bootstraper {
                         $fields = $this->updateFieldsFromMethods($model,
                           $fields);
 
+                        $collectionName = SchemaUtils::classNameToCollectionName($name);
+
                         $collection = new Collection(
-                            $model->getTable(),
+                            $collectionName,
                             $reflectionClass->getName(),
                             $primaryKey,
                             $fields
                         );
                         Logger::debug('[Apimap]     => Collection '.
-                          $model->getTable().' created.');
+                          $collectionName.' created.');
 
                         $this->collections[] = $collection;
                     }
@@ -130,18 +132,18 @@ class Bootstraper {
                         $relation = $matches[1];
                         $relationObj = SchemaUtils::getRelationship($model, $method);
                         if ($relationObj instanceof Relation) {
-                            $nameClass = $relationObj->getRelated()->getTable();
+                            $nameCollection = SchemaUtils::associationToCollectionName($relationObj);
 
                             if (in_array($relation, ['belongsToMany',
                               'hasMany'])) {
                                 $fields[] = new Field($method, ["Number"],
-                                  $nameClass.".id");
+                                  $nameCollection.".id");
                             } elseif ($relation == 'hasOne') {
                                 $fields[] = new Field($method, "Number",
-                                  $nameClass.".id", $model->getTable());
+                                  $nameCollection.".id", $model->getTable());
                             } elseif ($relation == 'belongsTo') {
                                 $fields[] = new Field($method, "Number",
-                                  $nameClass.".id");
+                                  $nameCollection.".id");
 
                                 // NOTICE: Remove dedicated belongTo id field
                                 foreach($fields as $id => $field) {
