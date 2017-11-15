@@ -16,8 +16,8 @@ class ResourcesSerializer {
                 $recordAssociated = $record->{$fieldName};
 
                 if ($recordAssociated) {
-                    $typeAssociation = SchemaUtils::findResourceName(
-                      $collectionModel->{$fieldName}()->getRelated());
+                    $typeAssociation = SchemaUtils::classNameToForestCollectionName(
+                      get_class($collectionModel->{$fieldName}()->getRelated()));
                     $resourceAssociated = new JsonApi\Resource($typeAssociation,
                       $recordAssociated->id);
                     $resourceAssociated->add_link('related', '/forest/'.
