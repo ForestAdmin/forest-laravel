@@ -3,6 +3,7 @@
 namespace ForestAdmin\ForestLaravel\Model;
 
 use Illuminate\Support\Facades\Config;
+use ForestAdmin\ForestLaravel\Logger;
 use ForestAdmin\Liana\Exception\RelationshipNotFoundException;
 
 class Collection {
@@ -56,7 +57,7 @@ class Collection {
             //       minority.
             } else if (array_key_exists($collectionNameOld, $actions)) {
                 Logger::warning('DEPRECATION WARNING: Collection names are now based on the '.
-                  'models names. Please rename the collection "'.$collectionNameOld.'" of your '
+                  'models names. Please rename the collection "'.$collectionNameOld.'" of your '.
                   'Forest customisation in "'.$collectionName.'".');
                 $collectionActions = $actions[$collectionNameOld];
                 if (!is_null($collectionActions)) {
