@@ -15,6 +15,8 @@ class CollectionSchema extends SchemaProvider {
         $attributes = array();
 
         $attributes['name'] = $collection->getName();
+        // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are minority.
+        $attributes['name-old'] = $collection->getNameOld();
         $attributes['fields'] = $collection->getFields();
 
         if($collection->getActions()) {

@@ -56,6 +56,9 @@ class Bootstraper {
 
                         $collection = new Collection(
                             $collectionName,
+                            // TODO: Remove nameOld attribute once the lianas versions older than
+                            //       0.1.4 are minority.
+                            $model->getTable(),
                             $reflectionClass->getName(),
                             $primaryKey,
                             $fields
