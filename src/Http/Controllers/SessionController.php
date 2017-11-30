@@ -62,6 +62,19 @@ class SessionController extends Controller {
         $jwtHeader = new JwtHeader(Config::get('forest.auth_key'));
         $jwtHeader->setAlgorithm('HS256');
 
+        $options = array(
+            'headers' => array(
+                'Content-Type' => 'application/json'
+            )
+        );
+
+        $client = new Client();
+        $response = $client->request('GET', '/environment/'.Config::get('forest.secret_key').'/authExpirationTime', $options);
+        $body = json_decode($response->getBody(), true)['authExpirationTime'];
+
+        $authExpirationTime = (14 * 24 * 3600);
+        if ($body) { $authExpirationTime = $body; }
+
         $jwt = new Jwt($jwtHeader);
         $jwt->custom(array(
             'id' => $user->id,
@@ -76,7 +89,7 @@ class SessionController extends Controller {
 
         // NOTICE: Expire in 2 weeks
         $jwt->issuedAt(time())
-            ->expireTime(time() + (14 * 24 * 3600));
+            ->expireTime(time() + ($authExpirationTime));
 
         return $jwt->encode();
     }
