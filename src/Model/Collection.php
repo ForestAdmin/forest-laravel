@@ -11,11 +11,23 @@ class Collection {
     protected $fields;
     protected $actions;
 
-    public function __construct($name, $entityClassName, $identifier, $fields,
+    public function __construct($name, $nameOld, $entityClassName, $identifier, $fields,
       $actions = null) {
         $this->setName($name);
+        // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are minority.
+        $this->setNameOld($nameOld);
         $this->setFields($fields);
         $this->setActions();
+    }
+
+    // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are minority.
+    public function setNameOld($nameOld) {
+        $this->nameOld = $nameOld;
+    }
+
+    // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are minority.
+    public function getNameOld() {
+        return $this->nameOld;
     }
 
     public function setName($name) {
@@ -29,13 +41,28 @@ class Collection {
     public function setActions() {
         $this->actions = array();
         $actions = Config::get('forest.actions');
-        $collectionName = ucfirst($this->getName());
+        $collectionName = $this->getName();
+        $collectionNameOld = $this->getNameOld();
 
-        if (!is_null($actions) && array_key_exists($collectionName, $actions)) {
-            $collectionActions = $actions[$collectionName];
-            if (!is_null($collectionActions)) {
-                foreach($collectionActions as $action) {
-                    $this->actions[] = new Action($this, $action);
+        if (!is_null($actions)) {
+            if (array_key_exists($collectionName, $actions)) {
+                $collectionActions = $actions[$collectionName];
+                if (!is_null($collectionActions)) {
+                    foreach($collectionActions as $action) {
+                        $this->actions[] = new Action($this, $action);
+                    }
+                }
+            // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are
+            //       minority.
+            } else if (array_key_exists($collectionNameOld, $actions)) {
+                Logger::warning('DEPRECATION WARNING: Collection names are now based on the '.
+                  'models names. Please rename the collection "'.$collectionNameOld.'" of your '
+                  'Forest customisation in "'.$collectionName.'".');
+                $collectionActions = $actions[$collectionNameOld];
+                if (!is_null($collectionActions)) {
+                    foreach($collectionActions as $action) {
+                        $this->actions[] = new Action($this, $action);
+                    }
                 }
             }
         }
