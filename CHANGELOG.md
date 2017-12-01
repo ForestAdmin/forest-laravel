@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.1.4 - 2017-12-01
 ### Fixed
 - Collection Names - Make the transition smooth between old and new collection name.
 
