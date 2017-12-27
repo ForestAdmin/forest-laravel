@@ -6,6 +6,6 @@ return [
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['POST', 'PUT', 'GET', 'DELETE'],
     'exposedHeaders' => [],
-    'maxAge' => 0,
+    'maxAge' => 86400, // NOTICE: 1 day
     'hosts' => [],
 ];
