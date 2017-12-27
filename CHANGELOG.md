@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- Performance - Reduce drastically the number of CORS preflight requests send by the API clients.
 
 ## RELEASE 0.1.4 - 2017-12-01
 ### Fixed
