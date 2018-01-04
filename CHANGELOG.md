@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Fixed
+- CORS - Update the CORS module to be compatible with Laravel >=5.5.0.
 
 ## RELEASE 0.1.5 - 2017-12-27
 ### Changed

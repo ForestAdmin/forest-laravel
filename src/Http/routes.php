@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['prefix' => 'forest', 'middleware' => 'cors'], function () {
+Route::group(['prefix' => 'forest', 'middleware' => \Barryvdh\Cors\HandleCors::class], function () {
     $namespace = '\ForestAdmin\ForestLaravel\Http\Controllers';
     Route::get('/', $namespace.'\ApimapController@index');
     Route::post('sessions', $namespace.'\SessionController@create');
