@@ -36,11 +36,11 @@ class SessionController extends Controller {
     public function createGoogle(Request $request) {
         $params = json_decode($request->getContent());
         $renderingId = $params->renderingId;
-        $accessToken = $params->accessToken;
+        $forestJwt = $params->forestJwt;
 
         if ($params) {
             $currentUser = null;
-            $user = $this->checkGoogleAuthAndGetUser($renderingId, $accessToken);
+            $user = $this->checkGoogleAuthAndGetUser($renderingId, $forestJwt);
 
             if ($user) {
                 $token = $this->generateAuthToken($user);
@@ -75,14 +75,14 @@ class SessionController extends Controller {
         return $usersAllowed;
     }
 
-    protected function checkGoogleAuthAndGetUser($renderingId, $accessToken) {
+    protected function checkGoogleAuthAndGetUser($renderingId, $forestJwt) {
         $client = new Client();
         $path = '/renderings/'.$renderingId.'/google-authorization';
         $options = array(
             'headers' => array(
                 'Content-Type' => 'application/json',
                 'forest-secret-key' => Config::get('forest.secret_key'),
-                'google-access-token' => $accessToken,
+                'forest-jwt' => $forestJwt,
             )
         );
         $response = $client->request('GET', $path, $options);
