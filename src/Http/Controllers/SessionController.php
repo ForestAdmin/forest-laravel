@@ -9,7 +9,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Config;
 use Psecio\Jwt\Header as JwtHeader;
 use Psecio\Jwt\Jwt;
-use Illuminate\Support\Facades\Log;
 
 class SessionController extends Controller {
     public function create(Request $request) {
@@ -122,7 +121,6 @@ class SessionController extends Controller {
     protected function generateTokenAndSendResponse($user) {
         if ($user) {
             $token = $this->generateAuthToken($user);
-            Log::info("token: " . $token);
             return response()->json(['token' => $token]);
         }
         Log::info("401");
