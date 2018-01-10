@@ -9,13 +9,14 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Config;
 use Psecio\Jwt\Header as JwtHeader;
 use Psecio\Jwt\Jwt;
+use Illuminate\Support\Facades\Log;
 
 class SessionController extends Controller {
     public function create(Request $request) {
         $params = json_decode($request->getContent());
+        $currentUser = null;
 
         if ($params) {
-            $currentUser = null;
             $usersAllowed = $this->getAllowedUsers($params);
 
             foreach($usersAllowed as $user) {
@@ -25,35 +26,27 @@ class SessionController extends Controller {
                     break;
                 }
             }
-            if ($currentUser) {
-                $token = $this->generateAuthToken($currentUser);
-                return response()->json(['token' => $token]);
-            }
         }
-        return response()->make('Unauthorized', 401);
+
+        return $this->generateTokenAndSendResponse($currentUser);
     }
 
-    public function createGoogle(Request $request) {
+    public function createWithGoogle(Request $request) {
         $params = json_decode($request->getContent());
         $renderingId = $params->renderingId;
         $forestJwt = $params->forestJwt;
+        $user = null;
 
         if ($params) {
-            $currentUser = null;
             $user = $this->checkGoogleAuthAndGetUser($renderingId, $forestJwt);
-
-            if ($user) {
-                $token = $this->generateAuthToken($user);
-                return response()->json(['token' => $token]);
-            }
         }
-        return response()->make('Unauthorized', 401);
+
+        return $this->generateTokenAndSendResponse($user);
     }
 
     protected function getAllowedUsers($params) {
         $usersAllowed = [];
 
-        $client = new Client();
         $path = '/renderings/'.$params->renderingId.'/allowed-users';
         $options = array(
             'headers' => array(
@@ -61,8 +54,7 @@ class SessionController extends Controller {
                 'forest-secret-key' => Config::get('forest.secret_key')
             )
         );
-        $response = $client->request('GET', $path, $options);
-        $response = json_decode($response->getBody());
+        $response = $this->makeRequestAndGetJsonResponse('GET', $path, $options);
 
         if ($response) {
             foreach ($response->data as $res) {
@@ -76,7 +68,6 @@ class SessionController extends Controller {
     }
 
     protected function checkGoogleAuthAndGetUser($renderingId, $forestJwt) {
-        $client = new Client();
         $path = '/renderings/'.$renderingId.'/google-authorization';
         $options = array(
             'headers' => array(
@@ -85,18 +76,24 @@ class SessionController extends Controller {
                 'forest-jwt' => $forestJwt,
             )
         );
-        $response = $client->request('GET', $path, $options);
-        $response = json_decode($response->getBody());
+        $response = $this->makeRequestAndGetJsonResponse('GET', $path, $options);
 
         if ($response) {
-            $res = $response->data;
-            $user = $res->attributes;
-            $user->id = $res->id;
+            $data = $response->data;
+            $user = $data->attributes;
+            $user->id = $data->id;
 
             return $user;
         }
 
         return null;
+    }
+
+    protected function makeRequestAndGetJsonResponse($type, $path, $options) {
+        $client = new Client();
+        $response = $client->request($type, $path, $options);
+
+        return json_decode($response->getBody());
     }
 
     protected function generateAuthToken($user) {
@@ -120,5 +117,15 @@ class SessionController extends Controller {
             ->expireTime(time() + (14 * 24 * 3600));
 
         return $jwt->encode();
+    }
+
+    protected function generateTokenAndSendResponse($user) {
+        if ($user) {
+            $token = $this->generateAuthToken($user);
+            Log::info("token: " . $token);
+            return response()->json(['token' => $token]);
+        }
+        Log::info("401");
+        return response()->make('Unauthorized', 401);
     }
 }

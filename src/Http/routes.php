@@ -4,7 +4,7 @@ Route::group(['prefix' => 'forest', 'middleware' => \Barryvdh\Cors\HandleCors::c
     $namespace = '\ForestAdmin\ForestLaravel\Http\Controllers';
     Route::get('/', $namespace.'\ApimapController@index');
     Route::post('sessions', $namespace.'\SessionController@create');
-    Route::post('sessions-google', $namespace.'\SessionController@createGoogle');
+    Route::post('sessions-google', $namespace.'\SessionController@createWithGoogle');
 
     Route::group(['middleware' => 'auth.forest'], function () {
         $namespace = '\ForestAdmin\ForestLaravel\Http\Controllers';
