@@ -46,6 +46,6 @@ gulp.task('build', () => {
     .pull(function(error) { if (error) { console.log(error); } })
     .then(function() { console.log(BRANCH_MASTER + ' pull done.'); })
     .mergeFromTo(BRANCH_DEVEL, BRANCH_MASTER)
-    .push();
-    .then(function() { console.log('Create a new Release on Github to publish the new package on Packagist.'); })
+    .push()
+    .then(function() { console.log('Create a new Release on Github to publish the new package on Packagist.'); });
 });
