@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Authentication - Users can connect to their project using Google Single Sign-On.
+
 ### Fixed
 - CORS - Update the CORS module to be compatible with Laravel >=5.5.0.
 

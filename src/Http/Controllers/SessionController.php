@@ -13,9 +13,9 @@ use Psecio\Jwt\Jwt;
 class SessionController extends Controller {
     public function create(Request $request) {
         $params = json_decode($request->getContent());
+        $currentUser = null;
 
         if ($params) {
-            $currentUser = null;
             $usersAllowed = $this->getAllowedUsers($params);
 
             foreach($usersAllowed as $user) {
@@ -25,18 +25,27 @@ class SessionController extends Controller {
                     break;
                 }
             }
-            if ($currentUser) {
-                $token = $this->generateAuthToken($currentUser);
-                return response()->json(['token' => $token]);
-            }
         }
-        return response()->make('Unauthorized', 401);
+
+        return $this->generateTokenAndSendResponse($currentUser);
+    }
+
+    public function createWithGoogle(Request $request) {
+        $params = json_decode($request->getContent());
+        $renderingId = $params->renderingId;
+        $forestToken = $params->forestToken;
+        $user = null;
+
+        if ($params) {
+            $user = $this->checkGoogleAuthAndGetUser($renderingId, $forestToken);
+        }
+
+        return $this->generateTokenAndSendResponse($user);
     }
 
     protected function getAllowedUsers($params) {
         $usersAllowed = [];
 
-        $client = new Client();
         $path = '/renderings/'.$params->renderingId.'/allowed-users';
         $options = array(
             'headers' => array(
@@ -44,8 +53,7 @@ class SessionController extends Controller {
                 'forest-secret-key' => Config::get('forest.secret_key')
             )
         );
-        $response = $client->request('GET', $path, $options);
-        $response = json_decode($response->getBody());
+        $response = $this->makeRequestAndGetJsonResponse('GET', $path, $options);
 
         if ($response) {
             foreach ($response->data as $res) {
@@ -56,6 +64,35 @@ class SessionController extends Controller {
         }
 
         return $usersAllowed;
+    }
+
+    protected function checkGoogleAuthAndGetUser($renderingId, $forestToken) {
+        $path = '/renderings/'.$renderingId.'/google-authorization';
+        $options = array(
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'forest-secret-key' => Config::get('forest.secret_key'),
+                'forest-token' => $forestToken,
+            )
+        );
+        $response = $this->makeRequestAndGetJsonResponse('GET', $path, $options);
+
+        if ($response) {
+            $data = $response->data;
+            $user = $data->attributes;
+            $user->id = $data->id;
+
+            return $user;
+        }
+
+        return null;
+    }
+
+    protected function makeRequestAndGetJsonResponse($type, $path, $options) {
+        $client = new Client();
+        $response = $client->request($type, $path, $options);
+
+        return json_decode($response->getBody());
     }
 
     protected function generateAuthToken($user) {
@@ -79,5 +116,13 @@ class SessionController extends Controller {
             ->expireTime(time() + (14 * 24 * 3600));
 
         return $jwt->encode();
+    }
+
+    protected function generateTokenAndSendResponse($user) {
+        if ($user) {
+            $token = $this->generateAuthToken($user);
+            return response()->json(['token' => $token]);
+        }
+        return response()->make('Unauthorized', 401);
     }
 }
