@@ -123,7 +123,6 @@ class SessionController extends Controller {
             $token = $this->generateAuthToken($user);
             return response()->json(['token' => $token]);
         }
-        Log::info("401");
         return response()->make('Unauthorized', 401);
     }
 }
