@@ -167,6 +167,8 @@ class Bootstraper {
 
     public function sendApimap() {
         $apimap = $this->createApimap();
+        sort($apimap['data'], SORT_REGULAR);
+        sort($apimap['included'], SORT_REGULAR);
         Logger::debug('[Apimap] => Generated Apimap: '.$apimap);
 
         // NOTICE: Removed PHP_EOL at the end of the files
