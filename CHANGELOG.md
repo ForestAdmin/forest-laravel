@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- Apimap - Prevent random sorting collections and useless updates.
 
 ## RELEASE 0.2.0 - 2018-01-11
 ### Added
