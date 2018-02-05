@@ -167,8 +167,25 @@ class Bootstraper {
 
     public function sendApimap() {
         $apimap = $this->createApimap();
-        sort($apimap['data'], SORT_REGULAR);
-        sort($apimap['included'], SORT_REGULAR);
+
+        function sortById($a, $b) {
+          return strcmp($a['id'], $b['id']);
+        }
+
+        function sortByField($a, $b) {
+          return strcmp($a['field'], $b['field']);
+        }
+
+        usort($apimap['data'], "sortById");
+
+        foreach ($apimap['data'] as $key => $value) {
+          usort($apimap['data'][$key]['attributes']['fields'], "sortByField");
+        }
+
+        if ($apimap['included']) {
+          usort($apimap['included'], "sortById");
+        }
+
         Logger::debug('[Apimap] => Generated Apimap: '.$apimap);
 
         // NOTICE: Removed PHP_EOL at the end of the files
