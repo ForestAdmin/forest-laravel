@@ -40,6 +40,7 @@ class OperatorDateIntervalGetter {
     protected $periodsPreviousXDays= '/^\$previous(\d+)Days$/';
     protected $periodsXDaysToDate = '/^\$(\d+)DaysToDate$/';
     protected $periodsXHoursBefore = '/^\$(\d+)HoursBefore$/';
+    protected $periodsXHoursAfter = '/^\$(\d+)HoursAfter$/';
 
     public function __construct($query, $typeWhere, $field, $value,
       $previous=false) {
@@ -70,6 +71,10 @@ class OperatorDateIntervalGetter {
         }
 
         if (preg_match($this->periodsXHoursBefore, $this->value, $matches)) {
+            return true;
+        }
+
+        if (preg_match($this->periodsXHoursAfter, $this->value, $matches)) {
             return true;
         }
 
@@ -146,6 +151,12 @@ class OperatorDateIntervalGetter {
             return $this->query->{$this->typeWhere}(function ($query) {
               $query->where($this->field, '<', Carbon::now()
                      ->subHours($this->matches[1][0]));
+            });
+        }
+
+        if (preg_match($this->periodsXHoursAfter, $this->value, $this->matches)) {
+            return $this->query->{$this->typeWhere}(function ($query) {
+              $query->where($this->field, '>', Carbon::now()->subHours($this->matches[1][0]));
             });
         }
 
