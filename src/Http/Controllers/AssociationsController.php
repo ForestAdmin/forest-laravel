@@ -118,22 +118,35 @@ class AssociationsController extends ApplicationController {
       Request $request) {
         $this->findModelsAndSchemas($modelName, $associationName);
         $content = $this->getContentData($request);
+        $withDeletion = $request->query('delete', 'false') === 'true';
 
         if ($this->modelResource) {
             $record = $this->modelResource->find($recordId);
             $relation = SchemaUtils::getRelationship($record, $associationName);
-            if ($relation instanceof HasMany) {
-                $foreignKey = $modelName.'_id';
-                foreach($content as $value) {
-                    $recordDissociated = $this->modelAssociation->find($value['id']);
-                    $recordDissociated->{$foreignKey} = null;
-                    $recordDissociated->save();
-                }
-            } else {
-                // NOTICE: Set BelongsToMany association
-                foreach($content as $value) {
-                    $relation->detach($value['id']);
-                }
+
+            $removeAssociation = !$withDeletion || $relation instanceof BelongsToMany;
+
+            if ($removeAssociation) {
+              if ($relation instanceof HasMany) {
+                  $foreignKey = $relation->getForeignKey();
+                  $foreignKey = explode('.', $foreignKey)[1];
+                  foreach($content as $value) {
+                      $recordDissociated = $this->modelAssociation->find($value['id']);
+                      $recordDissociated->{$foreignKey} = null;
+                      $recordDissociated->save();
+                  }
+              } else {
+                  // NOTICE: Set BelongsToMany association
+                  foreach($content as $value) {
+                      $relation->detach($value['id']);
+                  }
+              }
+            }
+
+            if ($withDeletion) {
+              foreach($content as $value) {
+                  $recordDissociated = $this->modelAssociation->destroy($value['id']);
+              }
             }
         }
 
