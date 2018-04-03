@@ -1,7 +1,7 @@
 {
   "name": "forestadmin/forest-laravel",
   "description": "Official Laravel Liana for Forest",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "type": "library",
   "keywords": ["forest", "laravel", "admin", "panel", "interface"],
   "homepage": "http://www.forestadmin.com",
