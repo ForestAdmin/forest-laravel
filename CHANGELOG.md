@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Smart Search - Limit search to specific colelction fields.
+
 ### Changed
 - Readme - Add some documentation about configuration cache.
 

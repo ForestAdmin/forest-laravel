@@ -4,6 +4,7 @@ namespace ForestAdmin\ForestLaravel\Http\Services;
 
 use ForestAdmin\ForestLaravel\Http\Services\ConditionSetter;
 use ForestAdmin\ForestLaravel\Http\Services\SearchBuilder;
+use ForestAdmin\ForestLaravel\Logger;
 
 class ResourcesGetter {
     protected $tableNameModel;
@@ -37,6 +38,9 @@ class ResourcesGetter {
         $this->addOrderBy($query);
         $query->where(function($query) { $this->addSearch($query); });
         $query->where(function($query) { $this->addFilters($query); });
+
+        Logger::debug('[SearchBuilder] ');
+        Logger::debug(print_r($query->toSql(), true));
 
         $this->records = $query->get();
 
