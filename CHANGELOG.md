@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- Readme - Add some documentation about configuration cache.
 
 ## RELEASE 0.3.0 - 2018-04-03
 ### Added
