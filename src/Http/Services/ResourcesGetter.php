@@ -39,9 +39,6 @@ class ResourcesGetter {
         $query->where(function($query) { $this->addSearch($query); });
         $query->where(function($query) { $this->addFilters($query); });
 
-        Logger::debug('[SearchBuilder] ');
-        Logger::debug(print_r($query->toSql(), true));
-
         $this->records = $query->get();
 
         $queryCount = $this->model->select($this->tableNameModel.'.*');
