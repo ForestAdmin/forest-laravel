@@ -78,7 +78,6 @@ class SearchBuilder {
                     }
                 } else if ($field->isTypeToOne() &&
                   (int)$this->params->searchExtended) {
-
                     $modelAssociation = $this->getCollectionSchema(
                       $field->getReferencedModelName());
                     $tableNameAssociation = SchemaUtils::findResource(

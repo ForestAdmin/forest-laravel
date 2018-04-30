@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- Smart Search - Limit search to specific colelction fields.
+- Smart Search - Limit search to specific collection fields.
 
 ### Changed
 - Readme - Add some documentation about configuration cache.

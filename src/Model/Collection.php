@@ -62,8 +62,8 @@ class Collection {
                 if (!is_null($collectionActions)) {
                     $actions = $collectionActions;
                 }
-                // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are
-                //       minority.
+            // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are
+            //       minority.
             } else if (array_key_exists($collectionNameOld, $oldForestLianaApiActions)) {
                 Logger::warning('DEPRECATION WARNING: Collection names are now based on the '.
                     'models names. Please rename the collection "'.$collectionNameOld.'" of your '.

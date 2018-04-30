@@ -4,7 +4,6 @@ namespace ForestAdmin\ForestLaravel\Http\Services;
 
 use ForestAdmin\ForestLaravel\Http\Services\ConditionSetter;
 use ForestAdmin\ForestLaravel\Http\Services\SearchBuilder;
-use ForestAdmin\ForestLaravel\Logger;
 
 class ResourcesGetter {
     protected $tableNameModel;
