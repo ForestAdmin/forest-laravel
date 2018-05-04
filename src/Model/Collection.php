@@ -41,32 +41,59 @@ class Collection {
 
     public function setActions() {
         $this->actions = array();
-        $actions = Config::get('forest.actions');
         $collectionName = $this->getName();
         $collectionNameOld = $this->getNameOld();
+        $collectionActions = $this->getActionsFromConfig($collectionName, $collectionNameOld);
 
-        if (!is_null($actions)) {
-            if (array_key_exists($collectionName, $actions)) {
-                $collectionActions = $actions[$collectionName];
+        if (!is_null($collectionActions)) {
+            foreach($collectionActions as $action) {
+                $this->actions[] = new Action($this, $action);
+            }
+        }
+    }
+
+    private function getActionsFromConfig($collectionName, $collectionNameOld) {
+        $actions = null;
+        $oldForestLianaApiActions = Config::get('forest.actions');
+
+        if (!is_null($oldForestLianaApiActions)) {
+            if (array_key_exists($collectionName, $oldForestLianaApiActions)) {
+                $collectionActions = $oldForestLianaApiActions[$collectionName];
                 if (!is_null($collectionActions)) {
-                    foreach($collectionActions as $action) {
-                        $this->actions[] = new Action($this, $action);
-                    }
+                    $actions = $collectionActions;
                 }
             // TODO: Remove nameOld attribute once the lianas versions older than 0.1.4 are
             //       minority.
-            } else if (array_key_exists($collectionNameOld, $actions)) {
+            } else if (array_key_exists($collectionNameOld, $oldForestLianaApiActions)) {
                 Logger::warning('DEPRECATION WARNING: Collection names are now based on the '.
-                  'models names. Please rename the collection "'.$collectionNameOld.'" of your '.
-                  'Forest customisation in "'.$collectionName.'".');
-                $collectionActions = $actions[$collectionNameOld];
+                    'models names. Please rename the collection "'.$collectionNameOld.'" of your '.
+                    'Forest customisation in "'.$collectionName.'".');
+                $collectionActions = $oldForestLianaApiActions[$collectionNameOld];
                 if (!is_null($collectionActions)) {
-                    foreach($collectionActions as $action) {
-                        $this->actions[] = new Action($this, $action);
+                    $actions = $collectionActions;
+                }
+            }
+        }
+
+        $collectionsConfig = Config::get('forest.collection');
+
+        if (!is_null($collectionsConfig) && array_key_exists($collectionName, $collectionsConfig)) {
+            $collectionConfig = $collectionsConfig[$collectionName];
+
+            if (!is_null($collectionConfig) && array_key_exists('actions', $collectionConfig)) {
+                $collectionActions = $collectionConfig['actions'];
+
+                if (!is_null($collectionActions)) {
+                    if (is_null($actions)) {
+                        $actions = $collectionActions;
+                    } else {
+                        $actions = array_merge($actions, $collectionActions);
                     }
                 }
             }
         }
+
+        return $actions;
     }
 
     public function getActions() {
