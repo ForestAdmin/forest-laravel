@@ -5,10 +5,8 @@
 - Custom Search - Developers can restrict the search to specific collection fields.
 
 ### Changed
-- Smart Actions - Developers can customize Smart Actions with a new API (closer to the other lianas implementation).
-
-### Changed
 - Readme - Add some documentation about configuration cache.
+- Smart Actions - Developers can customize Smart Actions with a new API (closer to the other lianas implementation).
 
 ## RELEASE 0.3.0 - 2018-04-03
 ### Added
