@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Smart Search - Limit search to specific collection fields.
+- Collection - Update the API to configurate a collection to be closer to the other lianas.
 
 ### Changed
 - Readme - Add some documentation about configuration cache.
