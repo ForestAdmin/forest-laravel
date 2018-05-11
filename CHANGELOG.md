@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.4.0 - 2018-05-11
 ### Added
 - Custom Search - Developers can restrict the search to specific collection fields.
 
