@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'url' => 'https://forestadmin-server.herokuapp.com',
+    'url' => 'https://api.forestadmin.com',
     'models_path' => 'app/models'
 ];

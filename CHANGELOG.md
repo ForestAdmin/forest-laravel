@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- Technical - Use the "official" domain for the default server host.
 
 ## RELEASE 0.4.0 - 2018-05-11
 ### Added
