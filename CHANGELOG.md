@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Changed
 - Technical - Use the "official" domain for the default server host.
+- Performance - Improve the speed of listing the records by executing their count into another request.
 
 ## RELEASE 0.4.0 - 2018-05-11
 ### Added

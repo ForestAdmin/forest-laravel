@@ -77,7 +77,7 @@ class ResourcesSerializer {
     }
 
     public static function returnJsonRecords($collectionModel,
-      $collectionSchema, $type, $records, $countTotal) {
+      $collectionSchema, $type, $records) {
         $collection = array();
 
         foreach ($records as $record) {
@@ -88,7 +88,6 @@ class ResourcesSerializer {
 
         $jsonapi = new JsonApi\Collection($type);
         $jsonapi->fill_collection($collection);
-        $jsonapi->add_meta('count', $countTotal);
 
         return $jsonapi->get_json();
     }

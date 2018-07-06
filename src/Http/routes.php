@@ -12,6 +12,7 @@ Route::group(['prefix' => 'forest', 'middleware' => \Barryvdh\Cors\HandleCors::c
         // Records
         Route::get('{modelName}.csv', $namespace.'\ResourcesController@exportCSV');
         Route::get('{modelName}', $namespace.'\ResourcesController@index');
+        Route::get('{modelName}/count', $namespace.'\ResourcesController@count');
         Route::post('{modelName}', $namespace.'\ResourcesController@create');
         Route::get('{modelName}/{recordId}', $namespace.'\ResourcesController@show');
         Route::put('{modelName}/{recordId}', $namespace.'\ResourcesController@update');
@@ -20,6 +21,7 @@ Route::group(['prefix' => 'forest', 'middleware' => \Barryvdh\Cors\HandleCors::c
         // Associations
         Route::get('{modelName}/{recordId}/relationships/{associationName}.csv', $namespace.'\AssociationsController@exportCSV');
         Route::get('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@index');
+        Route::get('{modelName}/{recordId}/relationships/{associationName}/count', $namespace.'\AssociationsController@count');
         Route::put('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@update');
         Route::post('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@associate');
         Route::delete('{modelName}/{recordId}/relationships/{associationName}', $namespace.'\AssociationsController@dissociate');

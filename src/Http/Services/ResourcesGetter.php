@@ -39,23 +39,22 @@ class ResourcesGetter {
         $query->where(function($query) { $this->addFilters($query); });
 
         $this->records = $query->get();
-
-        $queryCount = $this->model->select($this->tableNameModel.'.*');
-        $this->addJoins($queryCount);
-        $queryCount->where(function($query) { $this->addSearch($query); });
-        $queryCount->where(function($query) { $this->addFilters($query); });
-
-        $this->recordsCount = $queryCount->count();
     }
 
-    public function getQueryForBatch() {
-      $query = $this->model->select($this->tableNameModel.'.*');
+    public function count() {
+        $query = $this->getBaseQuery();
 
-      $this->addJoins($query);
-      $query->where(function($query) { $this->addSearch($query); });
-      $query->where(function($query) { $this->addFilters($query); });
+        $this->recordsCount = $query->count();
+    }
 
-      return $query;
+    public function getBaseQuery() {
+        $query = $this->model->select($this->tableNameModel.'.*');
+
+        $this->addJoins($query);
+        $query->where(function($query) { $this->addSearch($query); });
+        $query->where(function($query) { $this->addFilters($query); });
+
+        return $query;
     }
 
     protected function getIncludes() {

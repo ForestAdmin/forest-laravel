@@ -52,15 +52,14 @@ class HasManyGetter {
         });
 
         $this->records = $query->get();
+    }
 
-        $query = SchemaUtils::getRelationship(
-            $this->modelResource->find($this->params->recordId),
-            $this->associationName);
-
+    public function count() {
+        $query = $this->getBaseQuery();
         $this->recordsCount = $query->count();
     }
 
-    public function getQueryForBatch() {
+    public function getBaseQuery() {
         $query = $this->relationObject
           ->select($this->modelAssociation->getTable().'.*');
 
