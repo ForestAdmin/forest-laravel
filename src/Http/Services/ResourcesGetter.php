@@ -32,6 +32,8 @@ class ResourcesGetter {
         $query = $this->getBaseQuery()->skip(($pageNumber - 1) * $pageSize)
                                       ->take($pageSize);
 
+        $this->addOrderBy($query);
+
         $this->records = $query->get();
     }
 

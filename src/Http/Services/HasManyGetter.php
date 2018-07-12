@@ -37,7 +37,9 @@ class HasManyGetter {
         $pageSize = $this->params->page['size'];
 
         $query = $this->getBaseQuery()->skip(($pageNumber - 1) * $pageSize)
-                                     ->take($pageSize);
+                                      ->take($pageSize);
+
+        $this->addOrderBy($query);
 
         $this->records = $query->get();
     }
