@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## RELEASE 0.5.0 - 2018-07-20
 ### Changed
 - Technical - Use the "official" domain for the default server host.
 - Performance - Improve the speed of listing the records by executing their count into another request.
