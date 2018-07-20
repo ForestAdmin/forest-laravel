@@ -29,8 +29,9 @@ class ResourcesGetter {
         $pageNumber = $this->params->page['number'] ?: 1;
         $pageSize = $this->params->page['size'] ?: 10;
 
-        $query = $this->getBaseQuery()->skip(($pageNumber - 1) * $pageSize)
-                                      ->take($pageSize);
+        $query = $this->getBaseQuery()
+                      ->skip(($pageNumber - 1) * $pageSize)
+                      ->take($pageSize);
 
         $this->addOrderBy($query);
 
@@ -38,20 +39,12 @@ class ResourcesGetter {
     }
 
     public function count() {
-        $query = $this->getCountQuery();
-
+        $query = $this->getBaseQuery();
         $this->recordsCount = $query->count();
     }
 
     protected function getBaseQuery() {
         $query = $this->model->select($this->tableNameModel.'.*');
-        $query = $this->addSearchAndFilters($query);
-
-        return $query;
-    }
-
-    protected function getCountQuery() {
-        $query = $this->model;
         $query = $this->addSearchAndFilters($query);
 
         return $query;
@@ -124,7 +117,6 @@ class ResourcesGetter {
 
     protected function addSearchAndFilters($query) {
         $this->addJoins($query);
-
         $query->where(function($query) { $this->addSearch($query); });
         $query->where(function($query) { $this->addFilters($query); });
 

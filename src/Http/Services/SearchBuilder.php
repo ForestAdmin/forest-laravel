@@ -24,7 +24,7 @@ class SearchBuilder {
         $collectionName = $collectionSchema->getName();
         $config = Config::get('forest.collection');
 
-        if (array_key_exists($collectionName, $config)) {
+        if ($config && array_key_exists($collectionName, $config)) {
             $collectionConfig = $config[$collectionName];
 
             if (array_key_exists('search_fields', $collectionConfig)) {

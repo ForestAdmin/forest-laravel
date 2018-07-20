@@ -36,8 +36,9 @@ class HasManyGetter {
         }
         $pageSize = $this->params->page['size'];
 
-        $query = $this->getBaseQuery()->skip(($pageNumber - 1) * $pageSize)
-                                      ->take($pageSize);
+        $query = $this->getBaseQuery()
+                      ->skip(($pageNumber - 1) * $pageSize)
+                      ->take($pageSize);
 
         $this->addOrderBy($query);
 
@@ -45,21 +46,13 @@ class HasManyGetter {
     }
 
     public function count() {
-        $query = $this->getCountQuery();
-
+        $query = $this->getBaseQuery();
         $this->recordsCount = $query->count();
     }
 
     protected function getBaseQuery() {
         $query = $this->relationObject
-            ->select($this->modelAssociation->getTable().'.*');
-        $query = $this->addSearch($query);
-
-        return $query;
-    }
-
-    protected function getCountQuery() {
-        $query = $this->relationObject;
+                      ->select($this->modelAssociation->getTable().'.*');
         $query = $this->addSearch($query);
 
         return $query;
