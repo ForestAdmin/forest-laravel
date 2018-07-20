@@ -29,33 +29,25 @@ class ResourcesGetter {
         $pageNumber = $this->params->page['number'] ?: 1;
         $pageSize = $this->params->page['size'] ?: 10;
 
-        $query = $this->model->select($this->tableNameModel.'.*')
-                             ->skip(($pageNumber - 1) * $pageSize)
-                             ->take($pageSize);
+        $query = $this->getBaseQuery()
+                      ->skip(($pageNumber - 1) * $pageSize)
+                      ->take($pageSize);
 
-        $this->addJoins($query);
         $this->addOrderBy($query);
-        $query->where(function($query) { $this->addSearch($query); });
-        $query->where(function($query) { $this->addFilters($query); });
 
         $this->records = $query->get();
-
-        $queryCount = $this->model->select($this->tableNameModel.'.*');
-        $this->addJoins($queryCount);
-        $queryCount->where(function($query) { $this->addSearch($query); });
-        $queryCount->where(function($query) { $this->addFilters($query); });
-
-        $this->recordsCount = $queryCount->count();
     }
 
-    public function getQueryForBatch() {
-      $query = $this->model->select($this->tableNameModel.'.*');
+    public function count() {
+        $query = $this->getBaseQuery();
+        $this->recordsCount = $query->count();
+    }
 
-      $this->addJoins($query);
-      $query->where(function($query) { $this->addSearch($query); });
-      $query->where(function($query) { $this->addFilters($query); });
+    protected function getBaseQuery() {
+        $query = $this->model->select($this->tableNameModel.'.*');
+        $query = $this->addSearchAndFilters($query);
 
-      return $query;
+        return $query;
     }
 
     protected function getIncludes() {
@@ -96,6 +88,12 @@ class ResourcesGetter {
         }
     }
 
+    protected function addSearch($query) {
+        $searchBuilder = new SearchBuilder($query, $this->collectionSchema,
+            $this->tableNameModel, $this->fieldTableNames, $this->params);
+        $searchBuilder->perform();
+    }
+
     protected function addFilters($query) {
         if ($this->params->filter) {
             $typeWhere = $this->params->filterType == 'and' ? 'where' : 'orWhere';
@@ -117,6 +115,14 @@ class ResourcesGetter {
         }
     }
 
+    protected function addSearchAndFilters($query) {
+        $this->addJoins($query);
+        $query->where(function($query) { $this->addSearch($query); });
+        $query->where(function($query) { $this->addFilters($query); });
+
+        return $query;
+    }
+
     protected function addOrderBy($query) {
         if ($this->params->sort) {
             $order = 'ASC';
@@ -135,11 +141,5 @@ class ResourcesGetter {
             }
             $query->orderBy($this->params->sort, $order);
         }
-    }
-
-    protected function addSearch($query) {
-        $searchBuilder = new SearchBuilder($query, $this->collectionSchema,
-            $this->tableNameModel, $this->fieldTableNames, $this->params);
-        $searchBuilder->perform();
     }
 }

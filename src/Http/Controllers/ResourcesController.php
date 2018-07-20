@@ -22,9 +22,22 @@ class ResourcesController extends ApplicationController {
               $this->schemaResource, $request);
             $getter->perform();
             $json = ResourcesSerializer::returnJsonRecords($this->modelResource,
-              $this->schemaResource, $modelName, $getter->records,
-              $getter->recordsCount);
+              $this->schemaResource, $modelName, $getter->records);
             return Response::make($json, 200);
+        } else {
+            return Response::make('Collection not found', 404);
+        }
+    }
+
+    public function count(Request $request, $modelName) {
+        $this->findModelsAndSchemas($modelName);
+
+        if ($this->modelResource) {
+            $getter = new ResourcesGetter($modelName, $this->modelResource,
+              $this->schemaResource, $request);
+            $getter->count();
+            $count = $getter->recordsCount;
+            return Response::make(['count' => $count], 200);
         } else {
             return Response::make('Collection not found', 404);
         }
@@ -36,7 +49,7 @@ class ResourcesController extends ApplicationController {
         if ($this->modelResource) {
             $getter = new ResourcesGetter($modelName, $this->modelResource,
               $this->schemaResource, $request);
-            $batchQuery = $getter->getQueryForBatch();
+            $batchQuery = $getter->getBaseQuery();
             return $this->streamResponseCSV($request, $modelName, $batchQuery);
         } else {
             return Response::make('Collection not found', 404);

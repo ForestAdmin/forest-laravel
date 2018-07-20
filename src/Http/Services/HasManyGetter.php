@@ -36,41 +36,36 @@ class HasManyGetter {
         }
         $pageSize = $this->params->page['size'];
 
-        $query = $this->relationObject
-          ->select($this->modelAssociation->getTable().'.*')
-          ->skip(($pageNumber - 1) * $pageSize)
-          ->take($pageSize);
+        $query = $this->getBaseQuery()
+                      ->skip(($pageNumber - 1) * $pageSize)
+                      ->take($pageSize);
 
-        $this->addJoins($query);
         $this->addOrderBy($query);
 
-        $query->where(function($query) {
-          $searchBuilder = new SearchBuilder($query, $this->schemaAssociation,
-            $this->modelAssociation->getTable(), $this->fieldTableNames,
-            $this->params);
-          $searchBuilder->perform();
-        });
-
         $this->records = $query->get();
+    }
 
-        $query = SchemaUtils::getRelationship(
-            $this->modelResource->find($this->params->recordId),
-            $this->associationName);
-
+    public function count() {
+        $query = $this->getBaseQuery();
         $this->recordsCount = $query->count();
     }
 
-    public function getQueryForBatch() {
+    protected function getBaseQuery() {
         $query = $this->relationObject
-          ->select($this->modelAssociation->getTable().'.*');
+                      ->select($this->modelAssociation->getTable().'.*');
+        $query = $this->addSearch($query);
 
+        return $query;
+    }
+
+    protected function addSearch($query) {
         $this->addJoins($query);
 
         $query->where(function($query) {
-          $searchBuilder = new SearchBuilder($query, $this->schemaAssociation,
-            $this->modelAssociation->getTable(), $this->fieldTableNames,
-            $this->params);
-          $searchBuilder->perform();
+            $searchBuilder = new SearchBuilder($query, $this->schemaAssociation,
+                $this->modelAssociation->getTable(), $this->fieldTableNames,
+                $this->params);
+            $searchBuilder->perform();
         });
 
         return $query;

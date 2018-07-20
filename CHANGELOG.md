@@ -3,6 +3,10 @@
 ## [Unreleased]
 ### Changed
 - Technical - Use the "official" domain for the default server host.
+- Performance - Improve the speed of listing the records by executing their count into another request.
+
+### Fixed
+- Related Data - Fix the related data count value in the context of a search.
 
 ## RELEASE 0.4.0 - 2018-05-11
 ### Added

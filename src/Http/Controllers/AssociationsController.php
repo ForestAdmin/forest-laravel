@@ -30,6 +30,22 @@ class AssociationsController extends ApplicationController {
         }
     }
 
+    public function count($modelName, $recordId, $associationName,
+      Request $request) {
+        $this->findModelsAndSchemas($modelName, $associationName);
+
+        if ($this->modelResource && $this->modelAssociation) {
+            $getter = new HasManyGetter($this->modelResource,
+              $this->modelAssociation, $this->schemaAssociation,
+              $associationName, $request);
+            $getter->count();
+            $count = $getter->recordsCount;
+            return Response::make(['count' => $count], 200);
+        } else {
+            return Response::make('Collections not found', 404);
+        }
+    }
+
     public function exportCSV($modelName, $recordId, $associationName,
       Request $request) {
         $this->findModelsAndSchemas($modelName, $associationName);
@@ -38,7 +54,7 @@ class AssociationsController extends ApplicationController {
             $getter = new HasManyGetter($this->modelResource,
               $this->modelAssociation, $this->schemaAssociation,
               $associationName, $request);
-            $batchQuery = $getter->getQueryForBatch();
+            $batchQuery = $getter->getBaseQuery();
             return $this->streamResponseCSV($request, $associationName,
               $batchQuery);
         } else {
