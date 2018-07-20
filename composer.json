@@ -5,7 +5,7 @@
   "type": "library",
   "keywords": ["forest", "laravel", "admin", "panel", "interface"],
   "homepage": "http://www.forestadmin.com",
-  "license": "GNU GPLv3",
+  "license": "GPL-3.0-only",
   "authors": [
     {
       "name": "Arnaud Besnier",
