@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- Records Deletion - Delete a record which has already been deleted does not display an error anymore.
 
 ## RELEASE 0.5.0 - 2018-07-20
 ### Changed

@@ -126,13 +126,11 @@ class ResourcesController extends ApplicationController {
         $this->findModelsAndSchemas($modelName);
 
         if ($this->modelResource) {
-            try {
-                $record = $this->modelResource->findOrFail($recordId);
+            $record = $this->modelResource->find($recordId);
+            if ($record) {
                 $record->delete();
-                return Response::make('Success', 204);
-            } catch(ModelNotFoundException $exception) {
-                return Response::make('Object not found for this recordId', 404);
             }
+            return Response::make('Success', 204);
         } else {
             return Response::make('Collection not found', 404);
         }
